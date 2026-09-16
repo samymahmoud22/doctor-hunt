@@ -1,0 +1,50 @@
+{
+  "appName": "Doctor Hunt",
+  "onboarding": {
+    "title1": "Find Trusted Doctors",
+    "desc1": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of it over 2000 years old.",
+    "title2": "Choose Best Doctors",
+    "desc2": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of it over 2000 years old.",
+    "title3": "Easy Appointments",
+    "desc3": "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of it over 2000 years old.",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "skip": "Skip"
+  },
+  "role": {
+    "title": "Choose your role",
+    "subtitle": "The selected role determines the experience and available features.",
+    "patient": "Patient",
+    "patientDesc": "Find doctors, book appointments, and manage your medical records.",
+    "admin": "Admin",
+    "adminDesc": "Manage doctors, appointments, users, and the platform.",
+    "continueBtn": "Continue"
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Sign in to continue your healthcare journey",
+    "createAccount": "Create Account",
+    "registerSubtitle": "Join Doctor Hunt to book appointments & manage health",
+    "forgotPassword": "Forgot Password",
+    "forgotSubtitle": "Enter your email to receive password reset link",
+    "emailLabel": "Email Address",
+    "emailHint": "example@domain.com",
+    "passwordLabel": "Password",
+    "passwordHint": "••••••••",
+    "fullNameLabel": "Full Name",
+    "fullNameHint": "John Doe",
+    "rememberMe": "Remember Me",
+    "forgotPasswordLink": "Forgot Password?",
+    "loginBtn": "Sign In",
+    "registerBtn": "Sign Up",
+    "resetBtn": "Send Reset Link",
+    "socialSignIn": "Or sign in with",
+    "google": "Google",
+    "facebook": "Facebook",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "signUpLink": "Sign Up",
+    "signInLink": "Sign In",
+    "termsAgree": "I agree to the Terms of Service & Privacy Policy"
+  }
+}
