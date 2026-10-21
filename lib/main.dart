@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'app/core/router/app_router.dart';
-import 'app/core/themes/app_theme.dart';
-import 'generated/i18n/strings.g.dart';
+import 'package:doctor_hunt/core/constants/supabase_constants.dart';
+import 'package:doctor_hunt/core/di/service_locator.dart';
+import 'package:doctor_hunt/core/router/app_router.dart';
+import 'package:doctor_hunt/core/themes/app_theme.dart';
+import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
+    await Supabase.initialize(
+      url: SupabaseConstants.supabaseUrl,
+      publishableKey: SupabaseConstants.supabaseAnonKey,
+    );
   } catch (e) {
-    debugPrint('Firebase initialization warning: $e');
+    debugPrint('Supabase initialization warning: $e');
   }
-  runApp(const DoctorHuntApp());
+  await setupLocator();
+  LocaleSettings.useDeviceLocale();
+  runApp(TranslationProvider(child: const DoctorHuntApp()));
 }
 
 class DoctorHuntApp extends StatelessWidget {
@@ -26,13 +33,9 @@ class DoctorHuntApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       routerConfig: AppRouter.router,
-      locale: Translations.currentLocale.flutterLocale,
+      locale: TranslationProvider.of(context).flutterLocale,
       supportedLocales: AppLocale.values.map((e) => e.flutterLocale),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
     );
   }
 }

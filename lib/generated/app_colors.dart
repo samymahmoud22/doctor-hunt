@@ -1,1 +1,1 @@
-export '../app/core/themes/app_colors.dart';
+export '../core/themes/app_colors.dart';
