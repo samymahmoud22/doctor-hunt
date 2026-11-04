@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:doctor_hunt/core/utils/app_logger.dart';
 
 class SupabaseStorageService {
   final SupabaseClient _client;
@@ -31,10 +31,10 @@ class SupabaseStorageService {
       final publicUrl = _client.storage.from(bucket).getPublicUrl(path);
       return publicUrl;
     } on StorageException catch (e) {
-      debugPrint('Supabase StorageException on upload: ${e.message}');
+      AppLogger.error('Supabase StorageException on upload: ${e.message}', e);
       return null;
     } catch (e) {
-      debugPrint('Supabase Storage general upload error: $e');
+      AppLogger.error('Supabase Storage general upload error: $e', e);
       return null;
     }
   }
@@ -86,7 +86,7 @@ class SupabaseStorageService {
       await _client.storage.from(bucket).remove([path]);
       return true;
     } catch (e) {
-      debugPrint('Supabase Storage delete error: $e');
+      AppLogger.error('Supabase Storage delete error: $e', e);
       return false;
     }
   }

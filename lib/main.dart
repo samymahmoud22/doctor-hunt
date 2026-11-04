@@ -4,8 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:doctor_hunt/core/constants/supabase_constants.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
+import 'package:doctor_hunt/core/localization/locale_helper.dart';
 import 'package:doctor_hunt/core/router/app_router.dart';
 import 'package:doctor_hunt/core/themes/app_theme.dart';
+import 'package:doctor_hunt/core/utils/app_logger.dart';
 import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 
 void main() async {
@@ -16,10 +18,10 @@ void main() async {
       publishableKey: SupabaseConstants.supabaseAnonKey,
     );
   } catch (e) {
-    debugPrint('Supabase initialization warning: $e');
+    AppLogger.warning('Supabase initialization warning: $e');
   }
   await setupLocator();
-  LocaleSettings.useDeviceLocale();
+  await LocaleHelper.initializeLocale();
   runApp(TranslationProvider(child: const DoctorHuntApp()));
 }
 

@@ -8,8 +8,6 @@ import 'package:doctor_hunt/core/router/app_router.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
-import 'package:doctor_hunt/features/admin/data/models/admin_doctor_model.dart';
-import 'package:doctor_hunt/features/admin/data/repo/admin_repository.dart';
 import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 import 'package:doctor_hunt/generated/style_atoms.dart';
 import '../controller/auth_cubit.dart';
@@ -81,26 +79,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   context.showSnackBar(state.errorMessage!, isError: true);
                 } else if (state.status == AuthStatus.authenticated && state.user != null) {
                   final userRole = state.user!.role;
-                  if (userRole.isAdmin) {
-                    final repo = sl<AdminRepository>();
-                    final docName = state.user!.fullName.startsWith('Dr.')
-                        ? state.user!.fullName
-                        : 'Dr. ${state.user!.fullName}';
-                    final existing = repo.findDoctorByName(docName);
-                    if (existing == null) {
-                      repo.addDoctor(
-                        AdminDoctorModel(
-                          id: 'doc_${DateTime.now().millisecondsSinceEpoch}',
-                          name: docName,
-                          specialty: 'Specialist General',
-                          consultationFee: 30.0,
-                          isActive: true,
-                          rating: 5.0,
-                          reviewsCount: 1,
-                        ),
-                      );
-                    }
-                  }
                   context.showSnackBar('Welcome, ${state.user!.fullName}!');
                   MainRoute(role: userRole).go(context);
                 }

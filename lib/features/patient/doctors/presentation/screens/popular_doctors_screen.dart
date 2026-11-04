@@ -1,48 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/features/admin/data/models/admin_doctor_model.dart';
-import 'package:doctor_hunt/features/admin/data/repo/admin_repository.dart';
+import 'package:doctor_hunt/features/patient/doctors/presentation/controllers/patient_doctors_cubit.dart';
+import 'package:doctor_hunt/features/patient/doctors/presentation/controllers/patient_doctors_state.dart';
 import 'package:doctor_hunt/core/utils/doctor_image_helper.dart';
-import 'package:doctor_hunt/generated/image_assets.dart';
 
-class PopularDoctorsScreen extends StatefulWidget {
+class PopularDoctorsScreen extends StatelessWidget {
   const PopularDoctorsScreen({super.key});
 
   @override
-  State<PopularDoctorsScreen> createState() => _PopularDoctorsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<PatientDoctorsCubit>()..loadDoctors(),
+      child: const _PopularDoctorsView(),
+    );
+  }
 }
 
-String _getDoctorPhoto(String name, int index) {
-  return DoctorImageHelper.getDoctorPhoto(name, index);
-}
-
-class _PopularDoctorsScreenState extends State<PopularDoctorsScreen> {
-  List<AdminDoctorModel> _popularDoctors = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPopularDoctors();
-  }
-
-  Future<void> _loadPopularDoctors() async {
-    final list = await sl<AdminRepository>().getDoctors();
-    final active = list.where((d) => d.isActive).toList();
-    active.sort((a, b) => b.reviewsCount.compareTo(a.reviewsCount));
-
-    setState(() {
-      _popularDoctors = active;
-      _isLoading = false;
-    });
-  }
+class _PopularDoctorsView extends StatelessWidget {
+  const _PopularDoctorsView();
 
   @override
   Widget build(BuildContext context) {
-    final repo = sl<AdminRepository>();
-
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -103,32 +85,39 @@ class _PopularDoctorsScreenState extends State<PopularDoctorsScreen> {
               ),
 
               Expanded(
-                child: _isLoading
-                    ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
-                        itemCount: _popularDoctors.length,
-                        itemBuilder: (context, index) {
-                          final doc = _popularDoctors[index];
-                          final isFav = repo.isFavorite(doc.id);
+                child: BlocBuilder<PatientDoctorsCubit, PatientDoctorsState>(
+                  builder: (context, state) {
+                    if (state.isLoading) {
+                      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+                    }
 
-                          return _FigmaDoctorListCard(
-                            doctor: doc,
-                            index: index,
-                            isFavorite: isFav,
-                            onToggleFavorite: () {
-                              setState(() {
-                                repo.toggleFavorite(doc.id);
-                              });
-                            },
-                            onTap: () {
-                              context.push(
-                                '/doctor-details?name=${Uri.encodeComponent(doc.name)}&specialty=${Uri.encodeComponent(doc.specialty)}',
-                              );
-                            },
-                          );
-                        },
-                      ),
+                    final popularDoctors = state.popularDoctors;
+                    final cubit = context.read<PatientDoctorsCubit>();
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 6, 16, 24),
+                      itemCount: popularDoctors.length,
+                      itemBuilder: (context, index) {
+                        final doc = popularDoctors[index];
+                        final isFav = state.isFavorite(doc.id);
+
+                        return _FigmaDoctorListCard(
+                          doctor: doc,
+                          index: index,
+                          isFavorite: isFav,
+                          onToggleFavorite: () {
+                            cubit.toggleFavorite(doc.id);
+                          },
+                          onTap: () {
+                            context.push(
+                              '/doctor-details?name=${Uri.encodeComponent(doc.name)}&specialty=${Uri.encodeComponent(doc.specialty)}',
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -177,7 +166,7 @@ class _FigmaDoctorListCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                _getDoctorPhoto(doctor.name, index),
+                DoctorImageHelper.getDoctorPhoto(doctor.name, index),
                 width: 82,
                 height: 82,
                 fit: BoxFit.cover,

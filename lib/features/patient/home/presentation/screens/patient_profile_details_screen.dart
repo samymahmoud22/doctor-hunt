@@ -1,35 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/extensions/context_ext.dart';
+import 'package:doctor_hunt/core/themes/app_colors.dart';
+import 'package:doctor_hunt/core/themes/app_text_styles.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
+import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
+import 'package:doctor_hunt/features/patient/home/presentation/controllers/patient_profile_cubit.dart';
+import 'package:doctor_hunt/features/patient/home/presentation/controllers/patient_profile_state.dart';
+import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 import 'package:doctor_hunt/generated/image_assets.dart';
 
-class PatientProfileDetailsScreen extends StatefulWidget {
+class PatientProfileDetailsScreen extends StatelessWidget {
   const PatientProfileDetailsScreen({super.key});
 
   @override
-  State<PatientProfileDetailsScreen> createState() => _PatientProfileDetailsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<PatientProfileCubit>()..loadProfile(),
+      child: const _PatientProfileDetailsView(),
+    );
+  }
 }
 
-class _PatientProfileDetailsScreenState extends State<PatientProfileDetailsScreen> {
+class _PatientProfileDetailsView extends StatefulWidget {
+  const _PatientProfileDetailsView();
+
+  @override
+  State<_PatientProfileDetailsView> createState() => _PatientProfileDetailsViewState();
+}
+
+class _PatientProfileDetailsViewState extends State<_PatientProfileDetailsView> {
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
-  bool _isSaving = false;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    final user = Supabase.instance.client.auth.currentUser;
-    final metadata = user?.userMetadata;
-    final fullName = (metadata?['full_name'] as String?) ??
-        (metadata?['name'] as String?) ??
-        user?.email?.split('@').first ??
-        'Patient';
-    final phone = (metadata?['phone'] as String?) ?? '+201000000000';
-
-    _nameController = TextEditingController(text: fullName);
-    _phoneController = TextEditingController(text: phone);
+    _nameController = TextEditingController();
+    _phoneController = TextEditingController();
   }
 
   @override
@@ -41,278 +52,209 @@ class _PatientProfileDetailsScreenState extends State<PatientProfileDetailsScree
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: [0.75, 1.0],
-            colors: [
-              Colors.white,
-              Color(0xFFE8F8F5),
-            ],
-          ),
-        ),
-        child: Column(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.bottomCenter,
+    return BlocConsumer<PatientProfileCubit, PatientProfileState>(
+      listener: (context, state) {
+        if (!_initialized && !state.isLoading) {
+          _nameController.text = state.fullName;
+          _phoneController.text = state.phone;
+          _initialized = true;
+        }
+
+        if (state.errorMessage != null) {
+          context.showSnackBar(state.errorMessage!, isError: true);
+        } else if (state.isSaved) {
+          context.showSnackBar(t.common.success);
+          context.pop();
+        }
+      },
+      builder: (context, state) {
+        final cubit = context.read<PatientProfileCubit>();
+
+        return Scaffold(
+          backgroundColor: AppColors.white,
+          body: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.75, 1.0],
+                colors: [
+                  AppColors.white,
+                  AppColors.mintLight,
+                ],
+              ),
+            ),
+            child: Column(
               children: [
-                Container(
-                  height: 190,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF00D09E),
-                        Color(0xFF00C187),
-                      ],
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      height: 180,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.activeTeal,
+                            AppColors.primary,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(28),
+                          bottomRight: Radius.circular(28),
+                        ),
+                      ),
+                      child: SafeArea(
+                        bottom: false,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.white, size: 20),
+                                onPressed: () => context.pop(),
+                              ),
+                              const SizedBox(width: 8),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  t.home.profile,
+                                  style: AppTextStyles.h3.withWhite,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(36),
-                    ),
-                  ),
-                  child: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onTap: () => context.pop(),
-                            child: Container(
-                              width: 38,
-                              height: 38,
+
+                    Positioned(
+                      bottom: -46,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 92,
+                              height: 92,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.white, width: 4),
+                                boxShadow: const [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.08),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 3),
+                                    color: AppColors.boxShadow,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 4),
                                   ),
                                 ],
                               ),
-                              child: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                size: 16,
-                                color: Color(0xFF00D09E),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  ImageAssets.onboarding3Jpg,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                          const Text(
-                            'Profile',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 38),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                Positioned(
-                  bottom: -55,
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 110,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3.5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.12),
-                              blurRadius: 14,
-                              offset: const Offset(0, 6),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.activeTeal,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  color: AppColors.white,
+                                  size: 16,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            ImageAssets.userAvatar,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: () {
-                            context.showSnackBar('Photo upload dialog');
-                          },
-                          child: Container(
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF677294),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt_rounded,
-                              color: Colors.white,
-                              size: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 75),
-
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Personal information',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
                       ),
                     ),
-                    const SizedBox(height: 18),
-
-                    _buildEditableField(
-                      label: 'Name',
-                      controller: _nameController,
-                    ),
-                    const SizedBox(height: 16),
-
-                    _buildEditableField(
-                      label: 'Contact Number',
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                    ),
-
-                    const SizedBox(height: 36),
                   ],
                 ),
-              ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
-              child: CustomButton(
-                text: 'Save Profile',
-                height: 52,
-                isLoading: _isSaving,
-                onPressed: () async {
-                  setState(() => _isSaving = true);
-                  final newName = _nameController.text.trim();
-                  final newPhone = _phoneController.text.trim();
-                  try {
-                    await Supabase.instance.client.auth.updateUser(
-                      UserAttributes(
-                        data: {
-                          'full_name': newName,
-                          'phone': newPhone,
-                        },
-                      ),
-                    );
-                    if (mounted) {
-                      context.showSnackBar('Profile saved successfully');
-                      context.pop();
-                    }
-                  } catch (e) {
-                    if (mounted) {
-                      context.showSnackBar('Failed to update profile: $e', isError: true);
-                    }
-                  } finally {
-                    if (mounted) {
-                      setState(() => _isSaving = false);
-                    }
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+                const SizedBox(height: 60),
 
-  Widget _buildEditableField({
-    required String label,
-    required TextEditingController controller,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF00D09E),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomTextField(
+                          label: t.profile.nameQuestion,
+                          hint: t.profile.fullNameHint,
+                          controller: _nameController,
+                          fillColor: AppColors.inputBackground,
+                        ),
+                        const SizedBox(height: 20),
+
+                        CustomTextField(
+                          label: t.profile.phoneQuestion,
+                          hint: t.profile.phoneHint,
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          fillColor: AppColors.inputBackground,
+                        ),
+                        const SizedBox(height: 20),
+
+                        Text(
+                          t.auth.emailLabel,
+                          style: AppTextStyles.label,
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBackground,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.divider),
+                          ),
+                          child: Text(
+                            state.email,
+                            style: AppTextStyles.bodyMedium.withTextSub,
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 2),
-                TextField(
-                  controller: controller,
-                  keyboardType: keyboardType,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF2C3E50),
-                  ),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
+
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+                  child: CustomButton(
+                    text: t.profile.saveChanges,
+                    height: 52,
+                    isLoading: state.isLoading,
+                    onPressed: () {
+                      final newName = _nameController.text.trim();
+                      final newPhone = _phoneController.text.trim();
+                      cubit.updateProfile(
+                        fullName: newName.isNotEmpty ? newName : state.fullName,
+                        phone: newPhone.isNotEmpty ? newPhone : state.phone,
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(
-            Icons.edit_outlined,
-            color: Color(0xFF677294),
-            size: 18,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

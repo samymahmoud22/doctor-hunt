@@ -52,6 +52,9 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$home$en home = Translations$home$en.internal(_root);
 	late final Translations$doctors$en doctors = Translations$doctors$en.internal(_root);
 	late final Translations$admin$en admin = Translations$admin$en.internal(_root);
+	late final Translations$appointments$en appointments = Translations$appointments$en.internal(_root);
+	late final Translations$profile$en profile = Translations$profile$en.internal(_root);
+	late final Translations$drawer$en drawer = Translations$drawer$en.internal(_root);
 }
 
 // Path: onboarding
@@ -466,6 +469,9 @@ class Translations$doctors$en {
 
 	/// en: 'Send'
 	String get send => 'Send';
+
+	/// en: 'Booked'
+	String get booked => 'Booked';
 }
 
 // Path: admin
@@ -476,38 +482,242 @@ class Translations$admin$en {
 
 	// Translations
 
-	/// en: 'ADMIN PORTAL'
-	String get adminPortal => 'ADMIN PORTAL';
+	/// en: 'Doctors'
+	String get doctors => 'Doctors';
 
-	/// en: 'System Overview'
-	String get systemOverview => 'System Overview';
-
-	/// en: 'Total Patients'
-	String get totalPatients => 'Total Patients';
+	/// en: 'Active Doctors'
+	String get activeDoctors => 'Active Doctors';
 
 	/// en: 'Total Doctors'
 	String get totalDoctors => 'Total Doctors';
 
-	/// en: 'Today Appointments'
-	String get todayAppointments => 'Today Appointments';
+	/// en: 'Search doctors...'
+	String get searchDoctor => 'Search doctors...';
 
-	/// en: 'Pending Requests'
-	String get pendingRequests => 'Pending Requests';
+	/// en: 'Add Doctor'
+	String get addDoctor => 'Add Doctor';
 
-	/// en: 'Recent Appointment Requests'
-	String get recentAppointments => 'Recent Appointment Requests';
+	/// en: 'No Doctors Found'
+	String get noDoctorsFound => 'No Doctors Found';
 
-	/// en: 'Approve'
-	String get approve => 'Approve';
+	/// en: 'There are currently no doctors registered on Doctor Hunt. Add your first doctor to get started.'
+	String get noDoctorsDesc => 'There are currently no doctors registered on Doctor Hunt. Add your first doctor to get started.';
 
-	/// en: 'Reject'
-	String get reject => 'Reject';
+	/// en: 'Appointments'
+	String get appointments => 'Appointments';
 
-	/// en: 'Approved'
-	String get approved => 'Approved';
+	/// en: 'All'
+	String get all => 'All';
 
-	/// en: 'Rejected'
-	String get rejected => 'Rejected';
+	/// en: 'Availability'
+	String get availability => 'Availability';
+
+	/// en: 'Select Working Days'
+	String get selectWorkingDays => 'Select Working Days';
+
+	/// en: 'Working Hours'
+	String get workingHours => 'Working Hours';
+
+	/// en: 'Save Schedule'
+	String get saveSchedule => 'Save Schedule';
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
+
+	/// en: 'Admin Portal'
+	String get adminPortal => 'Admin Portal';
+}
+
+// Path: appointments
+class Translations$appointments$en {
+	Translations$appointments$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'My Appointments'
+	String get myAppointments => 'My Appointments';
+
+	/// en: 'Upcoming'
+	String get upcoming => 'Upcoming';
+
+	/// en: 'Completed'
+	String get completed => 'Completed';
+
+	/// en: 'Cancelled'
+	String get cancelled => 'Cancelled';
+
+	/// en: 'Cancel Appointment'
+	String get cancelAppointment => 'Cancel Appointment';
+
+	/// en: 'Are you sure you want to cancel this appointment?'
+	String get cancelConfirm => 'Are you sure you want to cancel this appointment?';
+
+	/// en: 'Rate Doctor'
+	String get rateDoctor => 'Rate Doctor';
+
+	/// en: 'Appointment Details'
+	String get appointmentDetails => 'Appointment Details';
+
+	/// en: 'Patient Information'
+	String get patientInfo => 'Patient Information';
+
+	/// en: 'Doctor Information'
+	String get doctorInfo => 'Doctor Information';
+
+	/// en: 'Date & Time'
+	String get dateAndTime => 'Date & Time';
+
+	/// en: 'Consultation Fee'
+	String get fee => 'Consultation Fee';
+
+	/// en: 'Status'
+	String get status => 'Status';
+
+	/// en: 'Clinic Location'
+	String get location => 'Clinic Location';
+
+	/// en: 'Reschedule'
+	String get reschedule => 'Reschedule';
+
+	/// en: 'Leave a Review'
+	String get leaveReview => 'Leave a Review';
+
+	/// en: 'Submit Review'
+	String get submitReview => 'Submit Review';
+
+	/// en: 'COMMENT (OPTIONAL)'
+	String get commentOptional => 'COMMENT (OPTIONAL)';
+
+	/// en: 'Share your consultation experience...'
+	String get shareExperience => 'Share your consultation experience...';
+
+	/// en: 'No appointments found'
+	String get noAppointments => 'No appointments found';
+
+	/// en: 'Your booked doctor appointments will appear here.'
+	String get noAppointmentsDesc => 'Your booked doctor appointments will appear here.';
+
+	/// en: 'Cancelled'
+	String get cancelledBadge => 'Cancelled';
+
+	/// en: 'Upcoming'
+	String get upcomingBadge => 'Upcoming';
+
+	/// en: 'Completed'
+	String get completedBadge => 'Completed';
+}
+
+// Path: profile
+class Translations$profile$en {
+	Translations$profile$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
+
+	/// en: 'Account settings'
+	String get accountSettings => 'Account settings';
+
+	/// en: 'Personal Information'
+	String get personalInfo => 'Personal Information';
+
+	/// en: 'Change Password'
+	String get changePassword => 'Change Password';
+
+	/// en: 'Enter new password'
+	String get enterNewPassword => 'Enter new password';
+
+	/// en: 'Enter your new password (minimum 6 characters):'
+	String get newPasswordMinChars => 'Enter your new password (minimum 6 characters):';
+
+	/// en: 'Update'
+	String get update => 'Update';
+
+	/// en: 'Log Out'
+	String get logout => 'Log Out';
+
+	/// en: 'Are you sure you want to logout?'
+	String get logoutConfirm => 'Are you sure you want to logout?';
+
+	/// en: 'Notifications'
+	String get notifications => 'Notifications';
+
+	/// en: 'Language'
+	String get language => 'Language';
+
+	/// en: 'Privacy Policy'
+	String get privacyPolicy => 'Privacy Policy';
+
+	/// en: 'Terms of Service'
+	String get termsOfService => 'Terms of Service';
+
+	/// en: 'Help & Support'
+	String get helpAndSupport => 'Help & Support';
+
+	/// en: 'What is your name?'
+	String get nameQuestion => 'What is your name?';
+
+	/// en: 'Your Phone Number'
+	String get phoneQuestion => 'Your Phone Number';
+
+	/// en: 'Your Full Name'
+	String get fullNameHint => 'Your Full Name';
+
+	/// en: '+20 100 000 0000'
+	String get phoneHint => '+20 100 000 0000';
+
+	/// en: 'Save Changes'
+	String get saveChanges => 'Save Changes';
+
+	/// en: 'Password changed successfully'
+	String get passwordChangedSuccess => 'Password changed successfully';
+
+	/// en: 'Password must be at least 6 characters'
+	String get passwordMinLength => 'Password must be at least 6 characters';
+
+	/// en: 'Password updated in local session'
+	String get passwordUpdatedLocal => 'Password updated in local session';
+
+	/// en: 'Ok'
+	String get ok => 'Ok';
+}
+
+// Path: drawer
+class Translations$drawer$en {
+	Translations$drawer$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'My Doctors'
+	String get myDoctors => 'My Doctors';
+
+	/// en: 'Medical Records'
+	String get medicalRecords => 'Medical Records';
+
+	/// en: 'Payment Methods'
+	String get paymentMethods => 'Payment Methods';
+
+	/// en: 'Favourites'
+	String get favourites => 'Favourites';
+
+	/// en: 'My Appointments'
+	String get myAppointments => 'My Appointments';
+
+	/// en: 'Payments'
+	String get payments => 'Payments';
+
+	/// en: 'Medicine Orders'
+	String get medicineOrders => 'Medicine Orders';
+
+	/// en: 'Help Center'
+	String get helpCenter => 'Help Center';
 }
 
 /// The flat map containing all translations for locale <en>.
@@ -600,6 +810,7 @@ extension on Translations {
 			'home.findDoctor' => 'Find Your Doctor',
 			'home.liveDoctors' => 'Live Doctors',
 			'home.popularDoctors' => 'Popular Doctors',
+			'home.topRatedDoctors' => 'Top Rated Doctors',
 			'home.featureDoctors' => 'Feature Doctors',
 			'home.dentist' => 'Dentist',
 			'home.cardiology' => 'Cardiology',
@@ -616,6 +827,7 @@ extension on Translations {
 			'doctors.doctorDetails' => 'Doctor Details',
 			'doctors.selectTime' => 'Select Time',
 			'doctors.popularDoctors' => 'Popular Doctors',
+			'doctors.topRatedDoctors' => 'Top Rated Doctors',
 			'doctors.favouriteDoctors' => 'Favourite Doctors',
 			'doctors.liveChat' => 'Live Chat',
 			'doctors.experience' => 'Experience',
@@ -628,23 +840,86 @@ extension on Translations {
 			'doctors.bookingSuccess' => 'Your appointment has been successfully booked.',
 			'doctors.slotsAvailable' => 'slots available',
 			'doctors.noSlotsAvailable' => 'No slots available',
+			'doctors.noDoctorsFound' => 'No doctors found',
+			'doctors.noFavoritesSaved' => 'No favorite doctors saved yet.',
+			'doctors.adjustSearchFilters' => 'Try adjusting your search or specialty filters.',
 			'doctors.today' => 'Today',
 			'doctors.tomorrow' => 'Tomorrow',
 			'doctors.afternoon' => 'Afternoon',
 			'doctors.evening' => 'Evening',
 			'doctors.typeMessage' => 'Type a message...',
 			'doctors.send' => 'Send',
-			'admin.adminPortal' => 'ADMIN PORTAL',
-			'admin.systemOverview' => 'System Overview',
-			'admin.totalPatients' => 'Total Patients',
+			'doctors.booked' => 'Booked',
+			'admin.doctors' => 'Doctors',
+			'admin.activeDoctors' => 'Active Doctors',
 			'admin.totalDoctors' => 'Total Doctors',
-			'admin.todayAppointments' => 'Today Appointments',
-			'admin.pendingRequests' => 'Pending Requests',
-			'admin.recentAppointments' => 'Recent Appointment Requests',
-			'admin.approve' => 'Approve',
-			'admin.reject' => 'Reject',
-			'admin.approved' => 'Approved',
-			'admin.rejected' => 'Rejected',
+			'admin.searchDoctor' => 'Search doctors...',
+			'admin.addDoctor' => 'Add Doctor',
+			'admin.noDoctorsFound' => 'No Doctors Found',
+			'admin.noDoctorsDesc' => 'There are currently no doctors registered on Doctor Hunt. Add your first doctor to get started.',
+			'admin.appointments' => 'Appointments',
+			'admin.all' => 'All',
+			'admin.availability' => 'Availability',
+			'admin.selectWorkingDays' => 'Select Working Days',
+			'admin.workingHours' => 'Working Hours',
+			'admin.saveSchedule' => 'Save Schedule',
+			'admin.settings' => 'Settings',
+			'admin.adminPortal' => 'Admin Portal',
+			'appointments.myAppointments' => 'My Appointments',
+			'appointments.upcoming' => 'Upcoming',
+			'appointments.completed' => 'Completed',
+			'appointments.cancelled' => 'Cancelled',
+			'appointments.cancelAppointment' => 'Cancel Appointment',
+			'appointments.cancelConfirm' => 'Are you sure you want to cancel this appointment?',
+			'appointments.rateDoctor' => 'Rate Doctor',
+			'appointments.appointmentDetails' => 'Appointment Details',
+			'appointments.patientInfo' => 'Patient Information',
+			'appointments.doctorInfo' => 'Doctor Information',
+			'appointments.dateAndTime' => 'Date & Time',
+			'appointments.fee' => 'Consultation Fee',
+			'appointments.status' => 'Status',
+			'appointments.location' => 'Clinic Location',
+			'appointments.reschedule' => 'Reschedule',
+			'appointments.leaveReview' => 'Leave a Review',
+			'appointments.submitReview' => 'Submit Review',
+			'appointments.commentOptional' => 'COMMENT (OPTIONAL)',
+			'appointments.shareExperience' => 'Share your consultation experience...',
+			'appointments.noAppointments' => 'No appointments found',
+			'appointments.noAppointmentsDesc' => 'Your booked doctor appointments will appear here.',
+			'appointments.cancelledBadge' => 'Cancelled',
+			'appointments.upcomingBadge' => 'Upcoming',
+			'appointments.completedBadge' => 'Completed',
+			'profile.settings' => 'Settings',
+			'profile.accountSettings' => 'Account settings',
+			'profile.personalInfo' => 'Personal Information',
+			'profile.changePassword' => 'Change Password',
+			'profile.enterNewPassword' => 'Enter new password',
+			'profile.newPasswordMinChars' => 'Enter your new password (minimum 6 characters):',
+			'profile.update' => 'Update',
+			'profile.logout' => 'Log Out',
+			'profile.logoutConfirm' => 'Are you sure you want to logout?',
+			'profile.notifications' => 'Notifications',
+			'profile.language' => 'Language',
+			'profile.privacyPolicy' => 'Privacy Policy',
+			'profile.termsOfService' => 'Terms of Service',
+			'profile.helpAndSupport' => 'Help & Support',
+			'profile.nameQuestion' => 'What is your name?',
+			'profile.phoneQuestion' => 'Your Phone Number',
+			'profile.fullNameHint' => 'Your Full Name',
+			'profile.phoneHint' => '+20 100 000 0000',
+			'profile.saveChanges' => 'Save Changes',
+			'profile.passwordChangedSuccess' => 'Password changed successfully',
+			'profile.passwordMinLength' => 'Password must be at least 6 characters',
+			'profile.passwordUpdatedLocal' => 'Password updated in local session',
+			'profile.ok' => 'Ok',
+			'drawer.myDoctors' => 'My Doctors',
+			'drawer.medicalRecords' => 'Medical Records',
+			'drawer.paymentMethods' => 'Payment Methods',
+			'drawer.favourites' => 'Favourites',
+			'drawer.myAppointments' => 'My Appointments',
+			'drawer.payments' => 'Payments',
+			'drawer.medicineOrders' => 'Medicine Orders',
+			'drawer.helpCenter' => 'Help Center',
 			_ => null,
 		};
 	}

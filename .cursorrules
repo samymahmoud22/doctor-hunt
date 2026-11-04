@@ -1,0 +1,63 @@
+# Flutter Enterprise Project AI Rules & Coding Standards
+
+## 1. Architecture & Layer Separation
+- Follow Feature-First Clean Architecture strictly.
+- Strict unidirection flow: UI (Screen/Widget) -> Cubit/Bloc -> Repository -> Service/Remote DataSource.
+- NEVER access SupabaseClient, HttpClient, or Dio directly from UI widgets or screens.
+- NEVER call Repositories directly from UI widgets; all data flow and async states must pass through a Cubit.
+- Keep Domain models pure; do NOT put UI properties (like display labels, colors, or icons) inside data/domain models. Use presentation extensions or view models.
+- Group features by domain/role (e.g. features/admin, features/patient, features/common).
+
+## 2. Dependency Injection
+- Use GetIt (`sl`) as the single, centralized Dependency Injection container in `lib/core/di/service_locator.dart`.
+- Register Repositories, Services, and Storage as `registerLazySingleton`.
+- Register Cubits/Blocs as `registerFactory` (or manage their lifecycle with `BlocProvider`).
+- Do NOT directly instantiate services or repositories inside widgets using constructors.
+
+## 3. State Management (BLoC / Cubit)
+- Use Cubit for business logic and asynchronous flows.
+- Do NOT over-engineer simple, local widget states (e.g., standard PageView controller, password visibility toggle); use StatefulWidget with setState.
+- All states must extend `Equatable` and remain immutable with clear `copyWith` methods.
+- Provide explicit UI states: initial, loading, authenticated/success, failure/error, and empty.
+
+## 4. Testing Standards
+- Always write comprehensive tests for critical features: Auth, Booking, Appointments, Favorites.
+- MUST test edge cases (network timeout, invalid inputs, conflicting bookings, empty results), not just happy paths.
+- Unit test Cubits, Repositories, and Core utilities (`Debouncer`, `SessionManager`, `LocaleHelper`).
+- Widget test shared components, dialogs, and key screen interactions.
+
+## 5. Business Logic & Data Integrity
+- Booking flow: Enforce double-booking prevention on BOTH frontend (reactive available slots calculation) and backend (unique constraint / transactions).
+- User Data: Scope favorites, orders, and appointment records to the authenticated user ID (`currentUserId`), not static IDs.
+- Error Handling: Never silently catch exceptions and return fake static data to hide backend errors. Rethrow `ServerException` and show explicit Retry UI states.
+
+## 6. Design System & UI Consistency
+- Zero hardcoded colors: Always use `AppColors.*`.
+- Zero hardcoded text styles: Always use `AppTextStyles.*`.
+- Reuse shared components: Use `CustomButton`, `CustomTextField`, and `LogoHeader` instead of repeating raw widgets.
+- Search Debouncing: Always debounce live search inputs with a reusable `Debouncer` (~300ms) and cancel/run immediately on submit or clear.
+
+## 7. Localization (Slang)
+- Zero hardcoded user-facing strings: Use `t.<module>.<key>` for all text in the UI.
+- Maintain JSON translation files in `assets/i18n/` and generated code in `lib/generated/i18n/`.
+- Dynamic language switching must trigger reactive app-wide rebuild using `LocaleSettings.setLocale()`.
+
+## 8. Routing & Navigation (GoRouter)
+- Be 100% consistent with GoRouter: use `context.push`, `context.go`, `context.pop`, `context.canPop`.
+- Do NOT mix raw `Navigator.push` without necessity.
+- Enforce Route Guards (`redirect` callback) for protected routes (Admin guards, Auth guards, Onboarding completion guards).
+- Never use force unwrap `!` in route builders or parameter lookups; provide safe fallbacks.
+
+## 9. Performance & Flutter Optimizations
+- Use `MediaQuery.sizeOf(context)`, `MediaQuery.paddingOf(context)`, and `MediaQuery.viewInsetsOf(context)` instead of `MediaQuery.of(context).size/padding` to avoid unnecessary rebuilds.
+- Always dispose Controllers, Timers, AnimationControllers, and Debouncers in `dispose()`.
+
+## 10. Type Safety & Clean Code
+- Use `enum` instead of magic/raw strings for user roles (`UserRole`), appointment statuses, and auth statuses.
+- Use leveled logging via `AppLogger` guarded by `kDebugMode` instead of raw `print` or `debugPrint`.
+
+## 11. AI Pair-Programming & Audit Workflow
+- When asked to review or audit: search for hardcoded strings/colors, duplicated UI, typos, raw logs, and missing edge case tests.
+- For simple/clear fixes: implement directly, then run `flutter analyze` and `flutter test`.
+- For architectural or business logic changes: ALWAYS explain the issue, proposal, and trade-offs FIRST and get user confirmation before modifying the code.
+
