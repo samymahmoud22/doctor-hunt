@@ -35,6 +35,9 @@ extract_images.ps1
 /build/
 /coverage/
 
+# Scratch files
+scratch/
+
 # Symbolication related
 app.*.symbols
 

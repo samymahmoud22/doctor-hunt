@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:doctor_hunt/features/patient/doctors/presentation/controllers/doctor_details_cubit.dart';
+import 'package:doctor_hunt/features/patient/doctors/presentation/controllers/doctor_details_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
-import 'package:doctor_hunt/features/admin/data/models/admin_doctor_model.dart';
-import 'package:doctor_hunt/features/admin/data/repo/admin_repository.dart';
-import 'package:doctor_hunt/features/patient/doctors/data/models/doctor_review_model.dart';
 import 'package:doctor_hunt/core/utils/doctor_image_helper.dart';
 import 'package:doctor_hunt/generated/i18n/strings.g.dart';
-import 'package:doctor_hunt/generated/image_assets.dart';
-
-class DoctorDetailsScreen extends StatefulWidget {
+class DoctorDetailsScreen extends StatelessWidget {
   final String name;
   final String specialty;
 
@@ -21,60 +19,42 @@ class DoctorDetailsScreen extends StatefulWidget {
   });
 
   @override
-  State<DoctorDetailsScreen> createState() => _DoctorDetailsScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<DoctorDetailsCubit>()..loadDoctorDetails(name, specialty: specialty),
+      child: const _DoctorDetailsContent(),
+    );
+  }
 }
 
-class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  AdminDoctorModel? _doctor;
-  List<DoctorReviewModel> _reviews = [];
-  bool _isLoading = true;
-  bool _isFavorite = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final repo = sl<AdminRepository>();
-    final doctors = await repo.getDoctors();
-    final match = doctors.firstWhere(
-      (d) => d.name.toLowerCase() == widget.name.toLowerCase() ||
-             d.specialty.toLowerCase().contains(widget.specialty.toLowerCase()),
-      orElse: () => doctors.first,
-    );
-
-    final reviews = await repo.getDoctorReviews(match.id);
-
-    setState(() {
-      _doctor = match;
-      _reviews = reviews;
-      _isFavorite = repo.isFavorite(match.id);
-      _isLoading = false;
-    });
-  }
+class _DoctorDetailsContent extends StatelessWidget {
+  const _DoctorDetailsContent();
 
   @override
   Widget build(BuildContext context) {
-    final repo = sl<AdminRepository>();
+    return BlocBuilder<DoctorDetailsCubit, DoctorDetailsState>(
+      builder: (context, state) {
+        if (state.isLoading || state.doctor == null) {
+          return const Scaffold(
+            backgroundColor: AppColors.backgroundLight,
+            body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+          );
+        }
 
-    if (_isLoading || _doctor == null) {
-      return const Scaffold(
-        backgroundColor: AppColors.backgroundLight,
-        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-      );
-    }
+        final doc = state.doctor!;
+        final centralLocation = state.clinicLocation;
+        final reviews = state.reviews;
+        final isFavorite = state.isFavorite;
+        final cubit = context.read<DoctorDetailsCubit>();
 
-    final doc = _doctor!;
-    final centralLocation = repo.centralLocation;
+    
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFF3FAF7), Colors.white, Color(0xFFE8F7F3)],
+            colors: [AppColors.backgroundLight, Colors.white, AppColors.mintLight],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -106,7 +86,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF333333)),
+                            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: AppColors.textMain),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -115,7 +95,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF333333),
+                            color: AppColors.textMain,
                           ),
                         ),
                       ],
@@ -140,7 +120,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         child: const Icon(
                           Icons.search_rounded,
                           size: 20,
-                          color: Color(0xFF333333),
+                          color: AppColors.textMain,
                         ),
                       ),
                     ),
@@ -191,7 +171,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                         style: const TextStyle(
                                           fontSize: 17,
                                           fontWeight: FontWeight.bold,
-                                          color: Color(0xFF333333),
+                                          color: AppColors.textMain,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
@@ -200,7 +180,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                       Text(
                                         doc.specialty,
                                         style: const TextStyle(
-                                          color: Color(0xFF677294),
+                                          color: AppColors.subtext,
                                           fontSize: 13,
                                         ),
                                       ),
@@ -212,7 +192,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                           return Icon(
                                             Icons.star_rounded,
                                             size: 16,
-                                            color: isFilled ? const Color(0xFFF6D060) : const Color(0xFFE5E7EB),
+                                            color: isFilled ? AppColors.ratingStar : AppColors.cardBorder,
                                           );
                                         }),
                                       ),
@@ -230,7 +210,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                           const Text(
                                             '/hr',
                                             style: TextStyle(
-                                              color: Color(0xFF677294),
+                                              color: AppColors.subtext,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -240,18 +220,13 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      repo.toggleFavorite(doc.id);
-                                      _isFavorite = repo.isFavorite(doc.id);
-                                    });
-                                  },
+                                  onTap: () => cubit.toggleFavorite(),
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     child: Icon(
-                                      _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                                      isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                                       size: 22,
-                                      color: const Color(0xFFFF4D4F),
+                                      color: AppColors.danger,
                                     ),
                                   ),
                                 ),
@@ -275,7 +250,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF333333),
+                          color: AppColors.textMain,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -304,7 +279,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.white,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                        border: Border.all(color: AppColors.cardBorder),
                       ),
                       child: Column(
                         children: [
@@ -353,13 +328,13 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           ),
                         ),
                         Text(
-                          '${_reviews.length} Comments',
+                          '${reviews.length} Comments',
                           style: const TextStyle(color: AppColors.textSub, fontSize: 12),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    if (_reviews.isEmpty)
+                    if (reviews.isEmpty)
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -374,14 +349,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         ),
                       )
                     else
-                      for (final rev in _reviews)
+                      for (final rev in reviews)
                         Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             color: AppColors.white,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                            border: Border.all(color: AppColors.cardBorder),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +380,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                   ),
                                   Row(
                                     children: [
-                                      const Icon(Icons.star_rounded, color: Color(0xFFF6D060), size: 16),
+                                      const Icon(Icons.star_rounded, color: AppColors.ratingStar, size: 16),
                                       const SizedBox(width: 3),
                                       Text(
                                         '${rev.rating}',
@@ -419,7 +394,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                 const SizedBox(height: 6),
                                 Text(
                                   rev.comment!,
-                                  style: const TextStyle(fontSize: 13, color: Color(0xFF555555), height: 1.3),
+                                  style: const TextStyle(fontSize: 13, color: AppColors.textDark, height: 1.3),
                                 ),
                               ],
                             ],
@@ -435,7 +410,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       ),
     ),
   );
-}
+      },
+    );
+  }
 
   Widget _buildServiceItem(String number, String text) {
     return Row(
@@ -455,7 +432,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             text,
             style: const TextStyle(
               fontSize: 13,
-              color: Color(0xFF677294),
+              color: AppColors.subtext,
               height: 1.4,
             ),
           ),
@@ -511,14 +488,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
+                        color: AppColors.textMain,
                       ),
                     ),
                   ),
                   const SizedBox(height: 3),
                   const Icon(
                     Icons.location_on_rounded,
-                    color: Color(0xFFFF4D4F),
+                    color: AppColors.danger,
                     size: 32,
                   ),
                 ],

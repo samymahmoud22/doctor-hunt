@@ -2,61 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
+import 'package:doctor_hunt/core/themes/app_text_styles.dart';
+import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:doctor_hunt/features/admin/data/models/admin_doctor_model.dart';
-import 'package:doctor_hunt/features/admin/data/repo/admin_repository.dart';
+import 'package:doctor_hunt/features/patient/doctors/presentation/controllers/patient_doctors_cubit.dart';
+import 'package:doctor_hunt/features/patient/doctors/presentation/controllers/patient_doctors_state.dart';
 import 'package:doctor_hunt/core/utils/doctor_image_helper.dart';
 import 'package:doctor_hunt/generated/image_assets.dart';
 import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 
-class PatientHomeScreen extends StatefulWidget {
+class PatientHomeScreen extends StatelessWidget {
   final VoidCallback? onOpenDrawer;
 
   const PatientHomeScreen({super.key, this.onOpenDrawer});
 
   @override
-  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<PatientDoctorsCubit>()..loadDoctors(),
+      child: _PatientHomeView(onOpenDrawer: onOpenDrawer),
+    );
+  }
 }
 
-class _PatientHomeScreenState extends State<PatientHomeScreen> {
-  List<AdminDoctorModel> _allDoctors = [];
-  bool _isLoading = true;
-  final String _selectedSpecialty = 'All';
+class _PatientHomeView extends StatelessWidget {
+  final VoidCallback? onOpenDrawer;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadDoctors();
-  }
-
-  Future<void> _loadDoctors() async {
-    final list = await sl<AdminRepository>().getDoctors();
-    setState(() {
-      _allDoctors = list.where((d) => d.isActive).toList();
-      _isLoading = false;
-    });
-  }
-
-  List<AdminDoctorModel> get _popularDoctors {
-    final list = List<AdminDoctorModel>.from(_allDoctors);
-    list.sort((a, b) => b.reviewsCount.compareTo(a.reviewsCount));
-    if (_selectedSpecialty != 'All') {
-      return list.where((d) => d.specialty.toLowerCase().contains(_selectedSpecialty.toLowerCase())).toList();
-    }
-    return list;
-  }
-
-  List<AdminDoctorModel> get _topRatedDoctors {
-    final list = List<AdminDoctorModel>.from(_allDoctors);
-    list.sort((a, b) => b.rating.compareTo(a.rating));
-    if (_selectedSpecialty != 'All') {
-      return list.where((d) => d.specialty.toLowerCase().contains(_selectedSpecialty.toLowerCase())).toList();
-    }
-    return list;
-  }
+  const _PatientHomeView({this.onOpenDrawer});
 
   @override
   Widget build(BuildContext context) {
-    final repo = sl<AdminRepository>();
+    return BlocBuilder<PatientDoctorsCubit, PatientDoctorsState>(
+      builder: (context, state) {
+        final cubit = context.read<PatientDoctorsCubit>();
+        final popularDoctors = state.popularDoctors;
+        final topRatedDoctors = List<AdminDoctorModel>.from(state.allDoctors)
+          ..sort((a, b) => b.rating.compareTo(a.rating));
+        final isLoading = state.isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
@@ -107,7 +90,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                             ],
                           ),
                           GestureDetector(
-                            onTap: widget.onOpenDrawer ?? () => context.push('/menu'),
+                            onTap: onOpenDrawer ?? () => context.push('/menu'),
                             child: Container(
                               width: 48,
                               height: 48,
@@ -144,19 +127,18 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                         ),
                       ],
                     ),
-                    child: TextField(
+                    child: CustomTextField(
                       readOnly: true,
-                      onTap: () {
-                        context.push('/find-doctors');
-                      },
-                      decoration: InputDecoration(
-                        hintText: t.common.search,
-                        hintStyle: const TextStyle(color: AppColors.textPlaceholder, fontSize: 14),
-                        prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textPlaceholder, size: 22),
-                        suffixIcon: const Icon(Icons.close_rounded, color: AppColors.textPlaceholder, size: 20),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      ),
+                      onTap: () => context.push('/find-doctors'),
+                      hint: t.common.search,
+                      hintStyle: AppTextStyles.bodyMedium.withPlaceholder,
+                      prefixIcon: Icons.search_rounded,
+                      suffixIcon: const Icon(Icons.close_rounded, color: AppColors.textPlaceholder, size: 20),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      fillColor: Colors.transparent,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                 ),
@@ -230,7 +212,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _SpecialtySquare(
-                    color: const Color(0xFF4C6FFF),
+                    color: AppColors.infoBlue,
                     iconWidget: const CustomPaint(
                       size: Size(26, 26),
                       painter: _ToothPainter(),
@@ -247,14 +229,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                     },
                   ),
                   _SpecialtySquare(
-                    color: const Color(0xFFFF9E44),
+                    color: AppColors.warning,
                     iconWidget: const Icon(Icons.visibility_rounded, color: AppColors.white, size: 28),
                     onTap: () {
                       context.push('/find-doctors?specialty=Eye');
                     },
                   ),
                   _SpecialtySquare(
-                    color: const Color(0xFFFF6E6E),
+                    color: AppColors.redAccent,
                     iconWidget: const Icon(Icons.accessibility_new_rounded, color: AppColors.white, size: 28),
                     onTap: () {
                       context.push('/find-doctors?specialty=Orthopedic');
@@ -295,16 +277,16 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _isLoading
+            isLoading
                 ? const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppColors.primary)))
                 : SizedBox(
                     height: 236,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _popularDoctors.length,
+                      itemCount: popularDoctors.length,
                       itemBuilder: (context, index) {
-                        final doc = _popularDoctors[index];
+                        final doc = popularDoctors[index];
                         return _FigmaPopularDoctorCard(
                           doctor: doc,
                           index: index,
@@ -350,27 +332,23 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            _isLoading
+            isLoading
                 ? const SizedBox.shrink()
                 : SizedBox(
                     height: 168,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _topRatedDoctors.length,
+                      itemCount: topRatedDoctors.length,
                       itemBuilder: (context, index) {
-                        final doc = _topRatedDoctors[index];
-                        final isFav = repo.isFavorite(doc.id);
+                        final doc = topRatedDoctors[index];
+                        final isFav = state.isFavorite(doc.id);
 
                         return _FigmaTopRatedDoctorCard(
                           doctor: doc,
                           index: index,
                           isFavorite: isFav,
-                          onToggleFavorite: () {
-                            setState(() {
-                              repo.toggleFavorite(doc.id);
-                            });
-                          },
+                          onToggleFavorite: () => cubit.toggleFavorite(doc.id),
                           onTap: () {
                             context.push(
                               '/doctor-details?name=${Uri.encodeComponent(doc.name)}&specialty=${Uri.encodeComponent(doc.specialty)}',
@@ -385,6 +363,8 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
           ],
         ),
       ),
+    );
+      },
     );
   }
 }
@@ -615,7 +595,7 @@ class _FigmaTopRatedDoctorCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF677294),
+                color: AppColors.subtext,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -709,7 +689,7 @@ class _LiveDoctorCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF3B30),
+                    color: AppColors.danger,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Row(
@@ -746,7 +726,7 @@ class _LiveDoctorCard extends StatelessWidget {
                   ),
                   child: const Icon(
                     Icons.play_arrow_rounded,
-                    color: Color(0xFF00D09E),
+                    color: AppColors.activeTeal,
                     size: 24,
                   ),
                 ),

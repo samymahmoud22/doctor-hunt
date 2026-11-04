@@ -47,6 +47,9 @@ class TranslationsAr extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$home$ar home = _Translations$home$ar._(_root);
 	@override late final _Translations$doctors$ar doctors = _Translations$doctors$ar._(_root);
 	@override late final _Translations$admin$ar admin = _Translations$admin$ar._(_root);
+	@override late final _Translations$appointments$ar appointments = _Translations$appointments$ar._(_root);
+	@override late final _Translations$profile$ar profile = _Translations$profile$ar._(_root);
+	@override late final _Translations$drawer$ar drawer = _Translations$drawer$ar._(_root);
 }
 
 // Path: onboarding
@@ -221,6 +224,7 @@ class _Translations$doctors$ar extends Translations$doctors$en {
 	@override String get evening => 'المساء';
 	@override String get typeMessage => 'اكتب رسالة...';
 	@override String get send => 'إرسال';
+	@override String get booked => 'محجوز';
 }
 
 // Path: admin
@@ -230,17 +234,103 @@ class _Translations$admin$ar extends Translations$admin$en {
 	final TranslationsAr _root; // ignore: unused_field
 
 	// Translations
-	@override String get adminPortal => 'بوابة الإدارة';
-	@override String get systemOverview => 'نظرة عامة على النظام';
-	@override String get totalPatients => 'إجمالي المرضى';
+	@override String get doctors => 'الأطباء';
+	@override String get activeDoctors => 'الأطباء النشطون';
 	@override String get totalDoctors => 'إجمالي الأطباء';
-	@override String get todayAppointments => 'مواعيد اليوم';
-	@override String get pendingRequests => 'طلبات معلقة';
-	@override String get recentAppointments => 'طلبات المواعيد الحديثة';
-	@override String get approve => 'قبول';
-	@override String get reject => 'رفض';
-	@override String get approved => 'تم القبول';
-	@override String get rejected => 'تم الرفض';
+	@override String get searchDoctor => 'البحث عن طبيب...';
+	@override String get addDoctor => 'إضافة طبيب';
+	@override String get noDoctorsFound => 'لم يتم العثور على أطباء';
+	@override String get noDoctorsDesc => 'لا يوجد حالياً أطباء مسجلون في التطبيق. أضف طبيبك الأول للبدء.';
+	@override String get appointments => 'المواعيد';
+	@override String get all => 'الكل';
+	@override String get availability => 'المواعيد المتاحة';
+	@override String get selectWorkingDays => 'اختر أيام العمل';
+	@override String get workingHours => 'ساعات العمل';
+	@override String get saveSchedule => 'حفظ الجدول';
+	@override String get settings => 'الإعدادات';
+	@override String get adminPortal => 'بوابة المسؤول';
+}
+
+// Path: appointments
+class _Translations$appointments$ar extends Translations$appointments$en {
+	_Translations$appointments$ar._(TranslationsAr root) : this._root = root, super.internal(root);
+
+	final TranslationsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get myAppointments => 'مواعيدي';
+	@override String get upcoming => 'القادمة';
+	@override String get completed => 'المكتملة';
+	@override String get cancelled => 'الملغاة';
+	@override String get cancelAppointment => 'إلغاء الموعد';
+	@override String get cancelConfirm => 'هل أنت متأكد من إلغاء هذا الموعد؟';
+	@override String get rateDoctor => 'تقييم الطبيب';
+	@override String get appointmentDetails => 'تفاصيل الموعد';
+	@override String get patientInfo => 'بيانات المريض';
+	@override String get doctorInfo => 'بيانات الطبيب';
+	@override String get dateAndTime => 'التاريخ والوقت';
+	@override String get fee => 'رسوم الكشف';
+	@override String get status => 'الحالة';
+	@override String get location => 'عنوان العيادة';
+	@override String get reschedule => 'إعادة جدولة';
+	@override String get leaveReview => 'أضف تقييمك';
+	@override String get submitReview => 'إرسال التقييم';
+	@override String get commentOptional => 'تعليق (اختياري)';
+	@override String get shareExperience => 'شاركنا تجربتك في الاستشارة...';
+	@override String get noAppointments => 'لا توجد مواعيد';
+	@override String get noAppointmentsDesc => 'ستظهر مواعيدك الطبية المحجوزة هنا.';
+	@override String get cancelledBadge => 'ملغي';
+	@override String get upcomingBadge => 'قادم';
+	@override String get completedBadge => 'مكتمل';
+}
+
+// Path: profile
+class _Translations$profile$ar extends Translations$profile$en {
+	_Translations$profile$ar._(TranslationsAr root) : this._root = root, super.internal(root);
+
+	final TranslationsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get settings => 'الإعدادات';
+	@override String get accountSettings => 'إعدادات الحساب';
+	@override String get personalInfo => 'المعلومات الشخصية';
+	@override String get changePassword => 'تغيير كلمة المرور';
+	@override String get enterNewPassword => 'أدخل كلمة المرور الجديدة';
+	@override String get newPasswordMinChars => 'أدخل كلمة المرور الجديدة (6 أحرف على الأقل):';
+	@override String get update => 'تحديث';
+	@override String get logout => 'تسجيل الخروج';
+	@override String get logoutConfirm => 'هل أنت متأكد من رغبتك في تسجيل الخروج؟';
+	@override String get notifications => 'الإشعارات';
+	@override String get language => 'اللغة';
+	@override String get privacyPolicy => 'سياسة الخصوصية';
+	@override String get termsOfService => 'شروط الخدمة';
+	@override String get helpAndSupport => 'المساعدة والدعم';
+	@override String get nameQuestion => 'ما هو اسمك؟';
+	@override String get phoneQuestion => 'رقم الهاتف';
+	@override String get fullNameHint => 'اسمك الكامل';
+	@override String get phoneHint => '+20 100 000 0000';
+	@override String get saveChanges => 'حفظ التغييرات';
+	@override String get passwordChangedSuccess => 'تم تغيير كلمة المرور بنجاح';
+	@override String get passwordMinLength => 'يجب ألا تقل كلمة المرور عن 6 أحرف';
+	@override String get passwordUpdatedLocal => 'تم تحديث كلمة المرور في الجلسة الحالية';
+	@override String get ok => 'حسناً';
+}
+
+// Path: drawer
+class _Translations$drawer$ar extends Translations$drawer$en {
+	_Translations$drawer$ar._(TranslationsAr root) : this._root = root, super.internal(root);
+
+	final TranslationsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get myDoctors => 'أطبائي';
+	@override String get medicalRecords => 'السجلات الطبية';
+	@override String get paymentMethods => 'طرق الدفع';
+	@override String get favourites => 'المفضلة';
+	@override String get myAppointments => 'مواعيدي';
+	@override String get payments => 'المدفوعات';
+	@override String get medicineOrders => 'طلبات الأدوية';
+	@override String get helpCenter => 'مركز المساعدة';
 }
 
 /// The flat map containing all translations for locale <ar>.
@@ -333,6 +423,7 @@ extension on TranslationsAr {
 			'home.findDoctor' => 'ابحث عن طبيبك',
 			'home.liveDoctors' => 'أطباء متاحون الآن',
 			'home.popularDoctors' => 'أطباء مشهورون',
+			'home.topRatedDoctors' => 'الأطباء الأعلى تقييماً',
 			'home.featureDoctors' => 'أطباء مميزون',
 			'home.dentist' => 'طبيب أسنان',
 			'home.cardiology' => 'أمراض القلب',
@@ -349,6 +440,7 @@ extension on TranslationsAr {
 			'doctors.doctorDetails' => 'تفاصيل الطبيب',
 			'doctors.selectTime' => 'تحديد الموعد',
 			'doctors.popularDoctors' => 'الأطباء المشهورون',
+			'doctors.topRatedDoctors' => 'الأطباء الأعلى تقييماً',
 			'doctors.favouriteDoctors' => 'الأطباء المفضلون',
 			'doctors.liveChat' => 'محادثة مباشرة',
 			'doctors.experience' => 'الخبرة',
@@ -361,23 +453,86 @@ extension on TranslationsAr {
 			'doctors.bookingSuccess' => 'تم حجز موعدك الطبي بنجاح.',
 			'doctors.slotsAvailable' => 'مواعيد متاحة',
 			'doctors.noSlotsAvailable' => 'لا توجد مواعيد متاحة',
+			'doctors.noDoctorsFound' => 'لم يتم العثور على أطباء',
+			'doctors.noFavoritesSaved' => 'لا يوجد أطباء مفضلون حتى الآن.',
+			'doctors.adjustSearchFilters' => 'جرب تعديل البحث أو الفلاتر.',
 			'doctors.today' => 'اليوم',
 			'doctors.tomorrow' => 'غداً',
 			'doctors.afternoon' => 'بعد الظهر',
 			'doctors.evening' => 'المساء',
 			'doctors.typeMessage' => 'اكتب رسالة...',
 			'doctors.send' => 'إرسال',
-			'admin.adminPortal' => 'بوابة الإدارة',
-			'admin.systemOverview' => 'نظرة عامة على النظام',
-			'admin.totalPatients' => 'إجمالي المرضى',
+			'doctors.booked' => 'محجوز',
+			'admin.doctors' => 'الأطباء',
+			'admin.activeDoctors' => 'الأطباء النشطون',
 			'admin.totalDoctors' => 'إجمالي الأطباء',
-			'admin.todayAppointments' => 'مواعيد اليوم',
-			'admin.pendingRequests' => 'طلبات معلقة',
-			'admin.recentAppointments' => 'طلبات المواعيد الحديثة',
-			'admin.approve' => 'قبول',
-			'admin.reject' => 'رفض',
-			'admin.approved' => 'تم القبول',
-			'admin.rejected' => 'تم الرفض',
+			'admin.searchDoctor' => 'البحث عن طبيب...',
+			'admin.addDoctor' => 'إضافة طبيب',
+			'admin.noDoctorsFound' => 'لم يتم العثور على أطباء',
+			'admin.noDoctorsDesc' => 'لا يوجد حالياً أطباء مسجلون في التطبيق. أضف طبيبك الأول للبدء.',
+			'admin.appointments' => 'المواعيد',
+			'admin.all' => 'الكل',
+			'admin.availability' => 'المواعيد المتاحة',
+			'admin.selectWorkingDays' => 'اختر أيام العمل',
+			'admin.workingHours' => 'ساعات العمل',
+			'admin.saveSchedule' => 'حفظ الجدول',
+			'admin.settings' => 'الإعدادات',
+			'admin.adminPortal' => 'بوابة المسؤول',
+			'appointments.myAppointments' => 'مواعيدي',
+			'appointments.upcoming' => 'القادمة',
+			'appointments.completed' => 'المكتملة',
+			'appointments.cancelled' => 'الملغاة',
+			'appointments.cancelAppointment' => 'إلغاء الموعد',
+			'appointments.cancelConfirm' => 'هل أنت متأكد من إلغاء هذا الموعد؟',
+			'appointments.rateDoctor' => 'تقييم الطبيب',
+			'appointments.appointmentDetails' => 'تفاصيل الموعد',
+			'appointments.patientInfo' => 'بيانات المريض',
+			'appointments.doctorInfo' => 'بيانات الطبيب',
+			'appointments.dateAndTime' => 'التاريخ والوقت',
+			'appointments.fee' => 'رسوم الكشف',
+			'appointments.status' => 'الحالة',
+			'appointments.location' => 'عنوان العيادة',
+			'appointments.reschedule' => 'إعادة جدولة',
+			'appointments.leaveReview' => 'أضف تقييمك',
+			'appointments.submitReview' => 'إرسال التقييم',
+			'appointments.commentOptional' => 'تعليق (اختياري)',
+			'appointments.shareExperience' => 'شاركنا تجربتك في الاستشارة...',
+			'appointments.noAppointments' => 'لا توجد مواعيد',
+			'appointments.noAppointmentsDesc' => 'ستظهر مواعيدك الطبية المحجوزة هنا.',
+			'appointments.cancelledBadge' => 'ملغي',
+			'appointments.upcomingBadge' => 'قادم',
+			'appointments.completedBadge' => 'مكتمل',
+			'profile.settings' => 'الإعدادات',
+			'profile.accountSettings' => 'إعدادات الحساب',
+			'profile.personalInfo' => 'المعلومات الشخصية',
+			'profile.changePassword' => 'تغيير كلمة المرور',
+			'profile.enterNewPassword' => 'أدخل كلمة المرور الجديدة',
+			'profile.newPasswordMinChars' => 'أدخل كلمة المرور الجديدة (6 أحرف على الأقل):',
+			'profile.update' => 'تحديث',
+			'profile.logout' => 'تسجيل الخروج',
+			'profile.logoutConfirm' => 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+			'profile.notifications' => 'الإشعارات',
+			'profile.language' => 'اللغة',
+			'profile.privacyPolicy' => 'سياسة الخصوصية',
+			'profile.termsOfService' => 'شروط الخدمة',
+			'profile.helpAndSupport' => 'المساعدة والدعم',
+			'profile.nameQuestion' => 'ما هو اسمك؟',
+			'profile.phoneQuestion' => 'رقم الهاتف',
+			'profile.fullNameHint' => 'اسمك الكامل',
+			'profile.phoneHint' => '+20 100 000 0000',
+			'profile.saveChanges' => 'حفظ التغييرات',
+			'profile.passwordChangedSuccess' => 'تم تغيير كلمة المرور بنجاح',
+			'profile.passwordMinLength' => 'يجب ألا تقل كلمة المرور عن 6 أحرف',
+			'profile.passwordUpdatedLocal' => 'تم تحديث كلمة المرور في الجلسة الحالية',
+			'profile.ok' => 'حسناً',
+			'drawer.myDoctors' => 'أطبائي',
+			'drawer.medicalRecords' => 'السجلات الطبية',
+			'drawer.paymentMethods' => 'طرق الدفع',
+			'drawer.favourites' => 'المفضلة',
+			'drawer.myAppointments' => 'مواعيدي',
+			'drawer.payments' => 'المدفوعات',
+			'drawer.medicineOrders' => 'طلبات الأدوية',
+			'drawer.helpCenter' => 'مركز المساعدة',
 			_ => null,
 		};
 	}

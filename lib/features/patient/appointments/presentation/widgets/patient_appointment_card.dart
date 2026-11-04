@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
+import 'package:doctor_hunt/core/themes/app_text_styles.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/utils/doctor_image_helper.dart';
-import 'package:doctor_hunt/generated/image_assets.dart';
+import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 import '../../data/models/patient_appointment_model.dart';
 import 'rate_doctor_dialog.dart';
 
@@ -48,10 +49,10 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF0F2F5)),
+        border: Border.all(color: AppColors.divider),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x06000000),
+            color: AppColors.boxShadow,
             blurRadius: 10,
             offset: Offset(0, 3),
           ),
@@ -86,21 +87,14 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                         children: [
                           Text(
                             appointment.doctorName,
-                            style: const TextStyle(
-                              color: Color(0xFF333333),
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTextStyles.titleMedium,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 3),
                           Text(
                             appointment.doctorSpecialty,
-                            style: const TextStyle(
-                              color: Color(0xFF677294),
-                              fontSize: 12,
-                            ),
+                            style: AppTextStyles.subtextSmall,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -125,7 +119,7 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE7F8F2),
+                                  color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
@@ -138,21 +132,14 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Appointment date',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF677294),
-                                    ),
+                                    style: AppTextStyles.caption.withTextSub,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     appointment.date,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF333333),
-                                    ),
+                                    style: AppTextStyles.bodySmall.withBold,
                                   ),
                                 ],
                               ),
@@ -165,7 +152,7 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE7F8F2),
+                                  color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
@@ -178,21 +165,14 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Consultation fee',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF677294),
-                                    ),
+                                  Text(
+                                    t.appointments.fee,
+                                    style: AppTextStyles.caption.withTextSub,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     '\$${appointment.fee.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF333333),
-                                    ),
+                                    style: AppTextStyles.bodySmall.withBold,
                                   ),
                                 ],
                               ),
@@ -212,7 +192,7 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE7F8F2),
+                                  color: AppColors.primaryLight,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
@@ -225,21 +205,14 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Appointment time',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Color(0xFF677294),
-                                    ),
+                                    style: AppTextStyles.caption.withTextSub,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     appointment.time,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF333333),
-                                    ),
+                                    style: AppTextStyles.bodySmall.withBold,
                                   ),
                                 ],
                               ),
@@ -258,11 +231,7 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                     children: [
                       Text(
                         appointment.isRated ? 'Your rating' : 'Tap to rate your visit',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF677294),
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.caption.withTextSub.withMedium,
                       ),
                       Row(
                         children: List.generate(5, (index) {
@@ -280,7 +249,7 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                               child: Icon(
                                 isFilled ? Icons.star_rounded : Icons.star_border_rounded,
                                 size: 20,
-                                color: const Color(0xFFF6D060),
+                                color: AppColors.ratingStar,
                               ),
                             ),
                           );
@@ -305,13 +274,9 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
-                          child: const Text(
+                          child: Text(
                             'View Details',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: AppTextStyles.captionBold.withPrimary,
                           ),
                         ),
                       ),
@@ -320,19 +285,15 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                         child: OutlinedButton(
                           onPressed: widget.onCancel,
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFFFF7875), width: 1.2),
+                            side: const BorderSide(color: AppColors.danger, width: 1.2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
-                          child: const Text(
-                            'Cancel Appointment',
-                            style: TextStyle(
-                              color: Color(0xFFFF4D4F),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Text(
+                            t.appointments.cancelAppointment,
+                            style: AppTextStyles.captionBold.withDanger,
                           ),
                         ),
                       ),
@@ -351,20 +312,16 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
-                          child: const Text(
+                          child: Text(
                             'View Details',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: AppTextStyles.captionBold.withPrimary,
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: CustomButton(
-                          text: appointment.isRated ? 'Rated' : 'Rate Doctor',
+                          text: appointment.isRated ? 'Rated' : t.appointments.rateDoctor,
                           height: 38,
                           fontSize: 12,
                           borderRadius: BorderRadius.circular(10),
@@ -398,13 +355,9 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                       ),
-                      child: const Text(
+                      child: Text(
                         'View Details',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: AppTextStyles.bodySmall.withPrimary.withSemiBold,
                       ),
                     ),
                   ),
@@ -424,19 +377,19 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
 
     switch (status) {
       case PatientAppointmentStatus.upcoming:
-        bg = const Color(0xFFE7F8F2);
+        bg = AppColors.primaryLight;
         textColor = AppColors.primary;
-        label = 'Upcoming';
+        label = t.appointments.upcoming;
         break;
       case PatientAppointmentStatus.completed:
-        bg = const Color(0xFFE7F8F2);
+        bg = AppColors.primaryLight;
         textColor = AppColors.primary;
-        label = 'Completed';
+        label = t.appointments.completed;
         break;
       case PatientAppointmentStatus.cancelled:
-        bg = const Color(0xFFFFF1F0);
-        textColor = const Color(0xFFFF4D4F);
-        label = 'Cancelled';
+        bg = AppColors.dangerLight;
+        textColor = AppColors.danger;
+        label = t.appointments.cancelled;
         break;
     }
 
@@ -460,10 +413,9 @@ class _PatientAppointmentCardState extends State<PatientAppointmentCard> {
           const SizedBox(width: 5),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+            style: AppTextStyles.caption.copyWith(
               color: textColor,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],

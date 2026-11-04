@@ -88,10 +88,10 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       PatientProfileScreen(onToggleRole: _toggleRole),
     ];
 
-    final List<Widget> adminPages = const [
-      AdminDoctorsScreen(),
-      AdminAppointmentsScreen(),
-      AdminSettingsScreen(),
+    final List<Widget> adminPages = [
+      const AdminDoctorsScreen(),
+      const AdminAppointmentsScreen(),
+      AdminSettingsScreen(onToggleRole: _toggleRole),
     ];
 
     final pages = isPatient ? patientPages : adminPages;
@@ -256,10 +256,12 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   }) {
     if (isSelected) {
       return GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () => setState(() => _currentIndex = index),
         child: Container(
-          width: 44,
-          height: 44,
+          width: 52,
+          height: 52,
+          alignment: Alignment.center,
           decoration: const BoxDecoration(
             color: Color(0xFF00D09E),
             shape: BoxShape.circle,
@@ -274,22 +276,23 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           child: Icon(
             selectedIcon ?? icon,
             color: Colors.white,
-            size: 22,
+            size: 24,
           ),
         ),
       );
     }
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => setState(() => _currentIndex = index),
       child: Container(
-        width: 44,
-        height: 44,
-        color: Colors.transparent,
+        width: 52,
+        height: 52,
+        alignment: Alignment.center,
         child: Icon(
           icon,
           color: const Color(0xFF9E9E9E),
-          size: 24,
+          size: 26,
         ),
       ),
     );

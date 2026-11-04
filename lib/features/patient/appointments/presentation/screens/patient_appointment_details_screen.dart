@@ -1,323 +1,667 @@
-import 'package:flutter/material.dart';
-import 'package:doctor_hunt/core/di/service_locator.dart';
-import 'package:doctor_hunt/core/extensions/context_ext.dart';
-import 'package:doctor_hunt/core/themes/app_colors.dart';
-import 'package:doctor_hunt/core/widgets/custom_button.dart';
-import '../../data/models/patient_appointment_model.dart';
-import '../../data/repo/patient_appointments_repository.dart';
-import '../widgets/rate_doctor_dialog.dart';
-
-class PatientAppointmentDetailsScreen extends StatefulWidget {
-  final String appointmentId;
-
-  const PatientAppointmentDetailsScreen({super.key, required this.appointmentId});
-
-  @override
-  State<PatientAppointmentDetailsScreen> createState() => _PatientAppointmentDetailsScreenState();
-}
-
-class _PatientAppointmentDetailsScreenState extends State<PatientAppointmentDetailsScreen> {
-  PatientAppointmentModel? _appointment;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final list = await sl<PatientAppointmentsRepository>().getAppointments();
-    final match = list.firstWhere(
-      (a) => a.id == widget.appointmentId,
-      orElse: () => list.first,
-    );
-    setState(() {
-      _appointment = match;
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _cancel() async {
-    await sl<PatientAppointmentsRepository>().cancelAppointment(widget.appointmentId);
-    if (mounted) {
-      context.showSnackBar('Appointment cancelled');
-      Navigator.of(context).pop(true);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading || _appointment == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF9FAFB),
-        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
-      );
-    }
-
-    final item = _appointment!;
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Appointment Details',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF333333),
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-                      child: const Icon(
-                        Icons.person_rounded,
-                        color: AppColors.primary,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.doctorName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            item.doctorSpecialty,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF677294),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: item.status == PatientAppointmentStatus.cancelled
-                            ? const Color(0xFFFFF1F0)
-                            : const Color(0xFFE7F8F2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        item.status.label,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: item.status == PatientAppointmentStatus.cancelled
-                              ? const Color(0xFFFF4D4F)
-                              : AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
-                ),
-                child: Column(
-                  children: [
-                    _buildDetailRow(
-                      icon: Icons.calendar_today_outlined,
-                      label: 'APPOINTMENT DATE',
-                      value: item.date,
-                    ),
-                    const Divider(height: 24, color: Color(0xFFF3F4F6)),
-                    _buildDetailRow(
-                      icon: Icons.access_time_rounded,
-                      label: 'APPOINTMENT TIME',
-                      value: item.time,
-                    ),
-                    const Divider(height: 24, color: Color(0xFFF3F4F6)),
-                    _buildDetailRow(
-                      icon: Icons.attach_money_rounded,
-                      label: 'CONSULTATION FEE',
-                      value: '\$${item.fee.toStringAsFixed(2)}',
-                    ),
-                    const Divider(height: 24, color: Color(0xFFF3F4F6)),
-                    _buildDetailRow(
-                      icon: Icons.location_on_outlined,
-                      label: 'CLINIC LOCATION',
-                      value: item.clinicLocation,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 36),
-
-              if (item.status == PatientAppointmentStatus.upcoming)
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: OutlinedButton(
-                    onPressed: _cancel,
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFFF4D4F), width: 1.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: const Color(0xFFFFF1F0),
-                    ),
-                    child: const Text(
-                      'Cancel Appointment',
-                      style: TextStyle(
-                        color: Color(0xFFFF4D4F),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              if (item.status == PatientAppointmentStatus.completed) ...[
-                if (item.isRated)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFBE6),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFFFE58F)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.star_rounded, color: Color(0xFFF6D060), size: 20),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Your Rating: ${item.userRating ?? 5.0} / 5.0',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF874D00),
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (item.reviewComment != null && item.reviewComment!.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            '"${item.reviewComment}"',
-                            style: const TextStyle(
-                              color: Color(0xFF874D00),
-                              fontStyle: FontStyle.italic,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  )
-                else
-                  CustomButton(
-                    text: 'Rate Doctor (1–5 Stars)',
-                    height: 52,
-                    onPressed: () {
-                      RateDoctorDialog.show(
-                        context,
-                        appointment: item,
-                        onSubmit: (rating, comment) async {
-                          await sl<PatientAppointmentsRepository>()
-                              .rateDoctor(item.id, rating, comment: comment);
-                          if (!mounted) return;
-                          this.context.showSnackBar('Thank you for your review!');
-                          _load();
-                        },
-                      );
-                    },
-                  ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE7F8F2),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: AppColors.primary, size: 20),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF677294),
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF333333),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
+import '../extensions/patient_appointment_status_ext.dart';
+import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:doctor_hunt/core/di/service_locator.dart';
+
+import 'package:doctor_hunt/core/extensions/context_ext.dart';
+
+import 'package:doctor_hunt/core/themes/app_colors.dart';
+
+import 'package:doctor_hunt/core/themes/app_text_styles.dart';
+
+import 'package:doctor_hunt/core/widgets/custom_button.dart';
+
+import 'package:doctor_hunt/generated/i18n/strings.g.dart';
+
+import '../../data/models/patient_appointment_model.dart';
+
+import '../controllers/patient_appointments_cubit.dart';
+
+import '../controllers/patient_appointments_state.dart';
+
+import '../widgets/rate_doctor_dialog.dart';
+
+
+
+class PatientAppointmentDetailsScreen extends StatelessWidget {
+
+  final String appointmentId;
+
+
+
+  const PatientAppointmentDetailsScreen({super.key, required this.appointmentId});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    return BlocProvider(
+
+      create: (_) => sl<PatientAppointmentsCubit>()..loadAppointments(),
+
+      child: _PatientAppointmentDetailsView(appointmentId: appointmentId),
+
+    );
+
+  }
+
+}
+
+
+
+class _PatientAppointmentDetailsView extends StatelessWidget {
+
+  final String appointmentId;
+
+
+
+  const _PatientAppointmentDetailsView({required this.appointmentId});
+
+
+
+  @override
+
+  Widget build(BuildContext context) {
+
+    return BlocConsumer<PatientAppointmentsCubit, PatientAppointmentsState>(
+
+      listener: (context, state) {
+
+        if (state.errorMessage != null) {
+
+          context.showSnackBar(state.errorMessage!, isError: true);
+
+        }
+
+      },
+
+      builder: (context, state) {
+
+        if (state.isLoading || state.allAppointments.isEmpty) {
+
+          return const Scaffold(
+
+            backgroundColor: AppColors.scaffoldBackground,
+
+            body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+
+          );
+
+        }
+
+
+
+        final match = state.allAppointments.firstWhere(
+
+          (a) => a.id == appointmentId,
+
+          orElse: () => state.allAppointments.first,
+
+        );
+
+        final item = match;
+
+        final cubit = context.read<PatientAppointmentsCubit>();
+
+
+
+        return Scaffold(
+
+          backgroundColor: AppColors.scaffoldBackground,
+
+          appBar: AppBar(
+
+            leading: IconButton(
+
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+
+              onPressed: () => context.pop(),
+
+            ),
+
+            title: Text(
+
+              t.appointments.appointmentDetails,
+
+              style: AppTextStyles.h3,
+
+            ),
+
+            centerTitle: true,
+
+            backgroundColor: Colors.transparent,
+
+            elevation: 0,
+
+          ),
+
+          body: SafeArea(
+
+            child: SingleChildScrollView(
+
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+
+              child: Column(
+
+                crossAxisAlignment: CrossAxisAlignment.start,
+
+                children: [
+
+                  Container(
+
+                    padding: const EdgeInsets.all(16),
+
+                    decoration: BoxDecoration(
+
+                      color: AppColors.white,
+
+                      borderRadius: BorderRadius.circular(16),
+
+                      border: Border.all(color: AppColors.divider),
+
+                    ),
+
+                    child: Row(
+
+                      children: [
+
+                        CircleAvatar(
+
+                          radius: 28,
+
+                          backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+
+                          child: const Icon(
+
+                            Icons.person_rounded,
+
+                            color: AppColors.primary,
+
+                            size: 32,
+
+                          ),
+
+                        ),
+
+                        const SizedBox(width: 14),
+
+                        Expanded(
+
+                          child: Column(
+
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+
+                              Text(
+
+                                item.doctorName,
+
+                                style: AppTextStyles.titleMedium,
+
+                              ),
+
+                              const SizedBox(height: 3),
+
+                              Text(
+
+                                item.doctorSpecialty,
+
+                                style: AppTextStyles.subtextSmall,
+
+                              ),
+
+                            ],
+
+                          ),
+
+                        ),
+
+                        Container(
+
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+
+                          decoration: BoxDecoration(
+
+                            color: item.status == PatientAppointmentStatus.cancelled
+
+                                ? AppColors.dangerLight
+
+                                : AppColors.primaryLight,
+
+                            borderRadius: BorderRadius.circular(20),
+
+                          ),
+
+                          child: Text(
+
+                            item.status.displayLabel,
+
+                            style: AppTextStyles.captionBold.copyWith(
+
+                              color: item.status == PatientAppointmentStatus.cancelled
+
+                                  ? AppColors.danger
+
+                                  : AppColors.primary,
+
+                            ),
+
+                          ),
+
+                        ),
+
+                      ],
+
+                    ),
+
+                  ),
+
+                  const SizedBox(height: 20),
+
+
+
+                  Container(
+
+                    padding: const EdgeInsets.all(18),
+
+                    decoration: BoxDecoration(
+
+                      color: AppColors.white,
+
+                      borderRadius: BorderRadius.circular(16),
+
+                      border: Border.all(color: AppColors.divider),
+
+                    ),
+
+                    child: Column(
+
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+
+                        Text(
+
+                          t.appointments.dateAndTime,
+
+                          style: AppTextStyles.labelBold,
+
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        _buildDetailRow(
+
+                          icon: Icons.calendar_today_rounded,
+
+                          label: 'Date',
+
+                          value: item.date,
+
+                        ),
+
+                        const Divider(height: 20, color: AppColors.cardBackground),
+
+                        _buildDetailRow(
+
+                          icon: Icons.access_time_rounded,
+
+                          label: 'Time',
+
+                          value: item.time,
+
+                        ),
+
+                        const Divider(height: 20, color: AppColors.cardBackground),
+
+                        _buildDetailRow(
+
+                          icon: Icons.location_on_rounded,
+
+                          label: t.appointments.location,
+
+                          value: item.clinicLocation.isNotEmpty
+
+                              ? item.clinicLocation
+
+                              : 'DoctorHunt HQ Clinic',
+
+                        ),
+
+                      ],
+
+                    ),
+
+                  ),
+
+                  const SizedBox(height: 20),
+
+
+
+                  Container(
+
+                    padding: const EdgeInsets.all(18),
+
+                    decoration: BoxDecoration(
+
+                      color: AppColors.white,
+
+                      borderRadius: BorderRadius.circular(16),
+
+                      border: Border.all(color: AppColors.divider),
+
+                    ),
+
+                    child: Column(
+
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+
+                        Text(
+
+                          t.appointments.fee,
+
+                          style: AppTextStyles.labelBold,
+
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        _buildDetailRow(
+
+                          icon: Icons.payments_rounded,
+
+                          label: t.appointments.fee,
+
+                          value: '\$${item.fee.toStringAsFixed(0)}',
+
+                        ),
+
+                        const Divider(height: 20, color: AppColors.cardBackground),
+
+                        _buildDetailRow(
+
+                          icon: Icons.confirmation_number_rounded,
+
+                          label: 'Booking ID',
+
+                          value: item.id.toUpperCase(),
+
+                        ),
+
+                      ],
+
+                    ),
+
+                  ),
+
+                  const SizedBox(height: 32),
+
+
+
+                  if (item.status == PatientAppointmentStatus.upcoming) ...[
+
+                    CustomButton(
+
+                      text: t.appointments.cancelAppointment,
+
+                      height: 52,
+
+                      backgroundColor: AppColors.dangerLight,
+
+                      textColor: AppColors.danger,
+
+                      onPressed: () async {
+
+                        final confirm = await showDialog<bool>(
+
+                          context: context,
+
+                          builder: (ctx) => AlertDialog(
+
+                            backgroundColor: AppColors.white,
+
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+
+                            title: Text(t.appointments.cancelAppointment, style: AppTextStyles.h3),
+
+                            content: Text(t.appointments.cancelConfirm, style: AppTextStyles.subtext),
+
+                            actions: [
+
+                              TextButton(
+
+                                onPressed: () => ctx.pop(false),
+
+                                child: Text(t.common.cancel, style: AppTextStyles.subtext),
+
+                              ),
+
+                              TextButton(
+
+                                onPressed: () => ctx.pop(true),
+
+                                child: Text(
+
+                                  t.appointments.cancelAppointment,
+
+                                  style: AppTextStyles.buttonSmall.withDanger.withBold,
+
+                                ),
+
+                              ),
+
+                            ],
+
+                          ),
+
+                        );
+
+                        if (confirm == true) {
+
+                          await cubit.cancelAppointment(appointmentId);
+
+                          if (context.mounted) {
+
+                            context.showSnackBar(t.common.success);
+
+                            context.pop(true);
+
+                          }
+
+                        }
+
+                      },
+
+                    ),
+
+                  ] else if (item.status == PatientAppointmentStatus.completed) ...[
+
+                    if (item.rating != null)
+
+                      Container(
+
+                        padding: const EdgeInsets.all(16),
+
+                        decoration: BoxDecoration(
+
+                          color: AppColors.warningLight,
+
+                          borderRadius: BorderRadius.circular(14),
+
+                          border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+
+                        ),
+
+                        child: Column(
+
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          children: [
+
+                            Row(
+
+                              children: [
+
+                                const Icon(Icons.star_rounded, color: AppColors.warning, size: 20),
+
+                                const SizedBox(width: 8),
+
+                                Text(
+
+                                  'Your Review: ${item.rating!.toStringAsFixed(1)} / 5.0',
+
+                                  style: AppTextStyles.labelBold.copyWith(color: const Color(0xFF874D00)),
+
+                                ),
+
+                              ],
+
+                            ),
+
+                            if (item.reviewComment != null && item.reviewComment!.isNotEmpty) ...[
+
+                              const SizedBox(height: 6),
+
+                              Text(
+
+                                '"${item.reviewComment}"',
+
+                                style: AppTextStyles.subtextMedium.copyWith(
+
+                                  fontStyle: FontStyle.italic,
+
+                                  color: const Color(0xFF874D00),
+
+                                ),
+
+                              ),
+
+                            ],
+
+                          ],
+
+                        ),
+
+                      )
+
+                    else
+
+                      CustomButton(
+
+                        text: t.appointments.rateDoctor,
+
+                        height: 52,
+
+                        onPressed: () {
+
+                          RateDoctorDialog.show(
+
+                            context,
+
+                            appointment: item,
+
+                            onSubmit: (rating, comment) async {
+
+                              await cubit.rateDoctor(item.id, rating, comment: comment);
+
+                              if (!context.mounted) return;
+
+                              context.showSnackBar(t.common.success);
+
+                            },
+
+                          );
+
+                        },
+
+                      ),
+
+                  ],
+
+                ],
+
+              ),
+
+            ),
+
+          ),
+
+        );
+
+      },
+
+    );
+
+  }
+
+
+
+  Widget _buildDetailRow({
+
+    required IconData icon,
+
+    required String label,
+
+    required String value,
+
+  }) {
+
+    return Row(
+
+      children: [
+
+        Container(
+
+          padding: const EdgeInsets.all(8),
+
+          decoration: BoxDecoration(
+
+            color: AppColors.cardBackground,
+
+            borderRadius: BorderRadius.circular(8),
+
+          ),
+
+          child: Icon(icon, size: 18, color: AppColors.primary),
+
+        ),
+
+        const SizedBox(width: 14),
+
+        Expanded(
+
+          child: Text(
+
+            label,
+
+            style: AppTextStyles.subtext,
+
+          ),
+
+        ),
+
+        Text(
+
+          value,
+
+          style: AppTextStyles.labelBold,
+
+        ),
+
+      ],
+
+    );
+
+  }
+
+}
+
