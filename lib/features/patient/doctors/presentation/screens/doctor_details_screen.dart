@@ -188,7 +188,8 @@ class _DoctorDetailsContent extends StatelessWidget {
 
                                       Row(
                                         children: List.generate(5, (index) {
-                                          final isFilled = index < (doc.rating.round().clamp(1, 5));
+                                          final isFilled = doc.reviewsCount > 0 &&
+                                              index < (doc.rating.round().clamp(0, 5));
                                           return Icon(
                                             Icons.star_rounded,
                                             size: 16,

@@ -46,8 +46,8 @@ class AuthRepository {
             specialty: 'Specialist General',
             consultationFee: 30.0,
             isActive: true,
-            rating: 5.0,
-            reviewsCount: 1,
+            rating: 0.0,
+            reviewsCount: 0,
           ),
         );
       }
@@ -82,10 +82,12 @@ class AuthRepository {
   Future<void> updatePatientProfile({
     required String fullName,
     required String phone,
+    String? avatarUrl,
   }) async {
     await authService.updatePatientProfile(
       fullName: fullName,
       phone: phone,
+      avatarUrl: avatarUrl,
     );
   }
 

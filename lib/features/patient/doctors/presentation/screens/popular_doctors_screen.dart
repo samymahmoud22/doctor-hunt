@@ -1,3 +1,4 @@
+import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -67,17 +68,17 @@ class _PopularDoctorsView extends StatelessWidget {
                         child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
                           size: 16,
-                          color: Color(0xFF333333),
+                          color: AppColors.textMain,
                         ),
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
-                      'Popular Doctors',
+                    Text(
+                      t.home.popularDoctors,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
+                        color: AppColors.textMain,
                       ),
                     ),
                   ],
@@ -187,7 +188,7 @@ class _FigmaDoctorListCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF333333),
+                            color: AppColors.textMain,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -224,26 +225,34 @@ class _FigmaDoctorListCard extends StatelessWidget {
                       Row(
                         children: List.generate(
                           5,
-                          (i) => Icon(
-                            Icons.star_rounded,
-                            color: i < 4 ? const Color(0xFFF6D060) : const Color(0xFFE5E7EB),
-                            size: 14,
-                          ),
+                          (i) {
+                            final isFilled = doctor.reviewsCount > 0 &&
+                                i < (doctor.rating.round().clamp(0, 5));
+                            return Icon(
+                              Icons.star_rounded,
+                              color: isFilled ? const Color(0xFFF6D060) : const Color(0xFFE5E7EB),
+                              size: 14,
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${doctor.rating}',
+                        doctor.reviewsCount == 0
+                            ? 'No reviews'
+                            : doctor.rating.toStringAsFixed(1),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF333333),
+                          color: AppColors.textMain,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '(${doctor.reviewsCount} views)',
+                          doctor.reviewsCount == 0
+                              ? ''
+                              : '(${doctor.reviewsCount} reviews)',
                           style: const TextStyle(
                             fontSize: 11,
                             color: Color(0xFF677294),

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/enums/user_role.dart';
 import 'package:doctor_hunt/core/router/app_router.dart';
+import 'package:doctor_hunt/core/services/session_manager.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/logo_header.dart';
@@ -44,9 +45,22 @@ class ChooseRoleScreen extends StatelessWidget {
 
                   return Column(
                     children: [
-                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.textMain),
+                          onPressed: () async {
+                            if (sl.isRegistered<SessionManager>()) {
+                              await sl<SessionManager>().setOnboardingCompleted(false);
+                            }
+                            if (context.mounted) {
+                              const OnboardingRoute().go(context);
+                            }
+                          },
+                        ),
+                      ),
                       const LogoHeader(size: 64),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       Text(
                         t.role.title,
                         style: context.bold24TextMain,
@@ -83,49 +97,34 @@ class ChooseRoleScreen extends StatelessWidget {
                           LoginRoute(role: state.selectedRole).go(context);
                         },
                       ),
-                      const SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          foregroundColor: AppColors.primary,
-                          side: const BorderSide(color: AppColors.primary, width: 1.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        icon: const Icon(Icons.flash_on_rounded, size: 20),
-                        label: Text(
-                          'Quick Demo (Direct Access)',
-                          style: context.bold14Primary.copyWith(fontSize: 15),
-                        ),
-                        onPressed: () {
-                          MainRoute(role: state.selectedRole).go(context);
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            t.auth.dontHaveAccount,
-                            style: context.regular14TextSub.copyWith(
-                              color: const Color(0xFF677294),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          GestureDetector(
-                            onTap: () {
-                              RegisterRoute(role: state.selectedRole).go(context);
-                            },
-                            child: Text(
-                              t.auth.joinUsLink,
-                              style: context.bold14Primary.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
+                      const SizedBox(height: 24),
+                      if (state.selectedRole != UserRole.admin) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              t.auth.dontHaveAccount,
+                              style: context.regular14TextSub.copyWith(
+                                color: const Color(0xFF677294),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () {
+                                RegisterRoute(role: UserRole.patient).go(context);
+                              },
+                              child: Text(
+                                t.auth.joinUsLink,
+                                style: context.bold14Primary.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ],
                   );
                 },

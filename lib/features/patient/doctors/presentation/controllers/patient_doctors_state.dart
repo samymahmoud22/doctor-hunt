@@ -4,6 +4,7 @@ import '../../../../admin/data/models/admin_doctor_model.dart';
 class PatientDoctorsState extends Equatable {
   final List<AdminDoctorModel> allDoctors;
   final List<AdminDoctorModel> popularDoctors;
+  final List<AdminDoctorModel> topRatedDoctors;
   final List<AdminDoctorModel> filteredDoctors;
   final Set<String> favoriteDoctorIds;
   final String searchQuery;
@@ -15,6 +16,7 @@ class PatientDoctorsState extends Equatable {
   const PatientDoctorsState({
     this.allDoctors = const [],
     this.popularDoctors = const [],
+    this.topRatedDoctors = const [],
     this.filteredDoctors = const [],
     this.favoriteDoctorIds = const {},
     this.searchQuery = '',
@@ -29,6 +31,7 @@ class PatientDoctorsState extends Equatable {
   PatientDoctorsState copyWith({
     List<AdminDoctorModel>? allDoctors,
     List<AdminDoctorModel>? popularDoctors,
+    List<AdminDoctorModel>? topRatedDoctors,
     List<AdminDoctorModel>? filteredDoctors,
     Set<String>? favoriteDoctorIds,
     String? searchQuery,
@@ -40,6 +43,7 @@ class PatientDoctorsState extends Equatable {
     return PatientDoctorsState(
       allDoctors: allDoctors ?? this.allDoctors,
       popularDoctors: popularDoctors ?? this.popularDoctors,
+      topRatedDoctors: topRatedDoctors ?? this.topRatedDoctors,
       filteredDoctors: filteredDoctors ?? this.filteredDoctors,
       favoriteDoctorIds: favoriteDoctorIds ?? this.favoriteDoctorIds,
       searchQuery: searchQuery ?? this.searchQuery,
@@ -54,6 +58,7 @@ class PatientDoctorsState extends Equatable {
   List<Object?> get props => [
         allDoctors,
         popularDoctors,
+        topRatedDoctors,
         filteredDoctors,
         favoriteDoctorIds,
         searchQuery,
@@ -63,4 +68,3 @@ class PatientDoctorsState extends Equatable {
         errorMessage,
       ];
 }
-

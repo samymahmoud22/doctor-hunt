@@ -78,17 +78,25 @@ class AdminDoctorCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: List.generate(
                               5,
-                              (index) => const Icon(
-                                Icons.star_rounded,
-                                size: 12,
-                                color: Color(0xFFF6D060),
-                              ),
+                              (index) {
+                                final isFilled = doctor.reviewsCount > 0 &&
+                                    index < (doctor.rating.round().clamp(0, 5));
+                                return Icon(
+                                  Icons.star_rounded,
+                                  size: 13,
+                                  color: isFilled
+                                      ? const Color(0xFFF6D060)
+                                      : const Color(0xFFE5E7EB),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              '${doctor.rating} (${doctor.reviewsCount})',
+                              doctor.reviewsCount == 0
+                                  ? 'No reviews yet'
+                                  : '${doctor.rating.toStringAsFixed(1)} (${doctor.reviewsCount})',
                               style: const TextStyle(
                                 color: Color(0xFF677294),
                                 fontSize: 11,

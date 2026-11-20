@@ -178,7 +178,7 @@ class AdminRepository {
 
       imageUrl: ImageAssets.doctorCard1,
 
-      clinicLocation: 'Upasana Dental Clinic, salt lake',
+      clinicLocation: centralLocation,
 
       workingDays: const {
 
@@ -580,7 +580,7 @@ class AdminRepository {
 
       fee: 32.0,
 
-      clinicLocation: 'Upasana Dental Clinic, salt lake',
+      clinicLocation: centralLocation,
 
       status: AdminAppointmentStatus.upcoming,
 
@@ -1281,25 +1281,16 @@ class AdminRepository {
 
 
     final docIndex = _doctors.indexWhere((d) => d.id == review.doctorId);
-
     if (docIndex != -1) {
-
-      final docReviews = _reviews.where((r) => r.doctorId == review.doctorId).toList();
-
-      final totalRating = docReviews.fold<double>(0.0, (sum, r) => sum + r.rating);
-
-      final newAvg = double.parse((totalRating / docReviews.length).toStringAsFixed(1));
-
-
+      final oldRating = _doctors[docIndex].rating;
+      final oldCount = _doctors[docIndex].reviewsCount;
+      final newCount = oldCount + 1;
+      final newAvg = double.parse((((oldRating * oldCount) + review.rating) / newCount).toStringAsFixed(1));
 
       _doctors[docIndex] = _doctors[docIndex].copyWith(
-
         rating: newAvg,
-
-        reviewsCount: _doctors[docIndex].reviewsCount + 1,
-
+        reviewsCount: newCount,
       );
-
     }
 
 

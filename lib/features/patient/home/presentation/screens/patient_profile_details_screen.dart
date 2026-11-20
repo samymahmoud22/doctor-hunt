@@ -5,6 +5,7 @@ import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/extensions/context_ext.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/core/themes/app_text_styles.dart';
+import 'package:doctor_hunt/core/utils/image_picker_helper.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
 import 'package:doctor_hunt/features/patient/home/presentation/controllers/patient_profile_cubit.dart';
@@ -138,47 +139,68 @@ class _PatientProfileDetailsViewState extends State<_PatientProfileDetailsView> 
                       left: 0,
                       right: 0,
                       child: Center(
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: 92,
-                              height: 92,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppColors.white, width: 4),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: AppColors.boxShadow,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  ImageAssets.onboarding3Jpg,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 30,
-                                height: 30,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.activeTeal,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final bytes = await ImagePickerHelper.pickImageBytes(context);
+                            if (bytes != null && context.mounted) {
+                              final url = await cubit.uploadAvatar(bytes);
+                              if (url != null && context.mounted) {
+                                context.showSnackBar('Profile photo updated successfully!');
+                              }
+                            }
+                          },
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 92,
+                                height: 92,
+                                decoration: BoxDecoration(
                                   shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.white, width: 4),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.boxShadow,
+                                      blurRadius: 10,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  color: AppColors.white,
-                                  size: 16,
+                                child: ClipOval(
+                                  child: state.avatarUrl != null && state.avatarUrl!.isNotEmpty
+                                      ? Image.network(
+                                          state.avatarUrl!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, _, _) => Image.asset(
+                                            ImageAssets.onboarding3Jpg,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : Image.asset(
+                                          ImageAssets.onboarding3Jpg,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                               ),
-                            ),
-                          ],
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.activeTeal,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.white, width: 2),
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: AppColors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

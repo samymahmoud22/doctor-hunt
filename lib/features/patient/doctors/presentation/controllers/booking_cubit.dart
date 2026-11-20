@@ -12,7 +12,7 @@ class BookingCubit extends Cubit<BookingState> {
   final PatientAppointmentsRepository appointmentsRepository;
   final FavoritesRepository favoritesRepository;
 
-  static const List<String> afternoonSlots = [
+  static const List<String> defaultAfternoonSlots = [
     '1:00 PM',
     '1:30 PM',
     '2:00 PM',
@@ -22,7 +22,7 @@ class BookingCubit extends Cubit<BookingState> {
     '4:00 PM',
   ];
 
-  static const List<String> eveningSlots = [
+  static const List<String> defaultEveningSlots = [
     '5:00 PM',
     '5:30 PM',
     '6:00 PM',
@@ -64,6 +64,78 @@ class BookingCubit extends Cubit<BookingState> {
     return '${date.day} ${monthNames[date.month - 1]} ${date.year}';
   }
 
+  static int _parseTimeToMinutes(String timeStr) {
+    try {
+      final parts = timeStr.trim().split(' ');
+      if (parts.length != 2) return 780; // 1:00 PM
+      final timeParts = parts[0].split(':');
+      int hour = int.tryParse(timeParts[0]) ?? 1;
+      final int minute = int.tryParse(timeParts[1]) ?? 0;
+      final isPm = parts[1].toUpperCase() == 'PM';
+
+      if (isPm && hour < 12) hour += 12;
+      if (!isPm && hour == 12) hour = 0;
+
+      return hour * 60 + minute;
+    } catch (_) {
+      return 780;
+    }
+  }
+
+  static int _parseSlotDuration(String durationStr) {
+    try {
+      final digits = RegExp(r'\d+').firstMatch(durationStr)?.group(0);
+      return digits != null ? int.parse(digits) : 30;
+    } catch (_) {
+      return 30;
+    }
+  }
+
+  static String _formatMinutesToTime(int totalMinutes) {
+    int hour = totalMinutes ~/ 60;
+    final int minute = totalMinutes % 60;
+    final isPm = hour >= 12;
+
+    int displayHour = hour;
+    if (displayHour > 12) displayHour -= 12;
+    if (displayHour == 0) displayHour = 12;
+
+    final hourStr = displayHour.toString();
+    final minStr = minute.toString().padLeft(2, '0');
+    final ampm = isPm ? 'PM' : 'AM';
+
+    return '$hourStr:$minStr $ampm';
+  }
+
+  static List<String> generateSlotsForDoctor(AdminDoctorModel? doc) {
+    if (doc == null) {
+      return [...defaultAfternoonSlots, ...defaultEveningSlots];
+    }
+
+    final startMinutes = _parseTimeToMinutes(doc.startTime);
+    final endMinutes = _parseTimeToMinutes(doc.endTime);
+    final durationMinutes = _parseSlotDuration(doc.slotDuration);
+
+    if (startMinutes >= endMinutes || durationMinutes <= 0) {
+      return [...defaultAfternoonSlots, ...defaultEveningSlots];
+    }
+
+    final List<String> slots = [];
+    int current = startMinutes;
+    while (current + durationMinutes <= endMinutes) {
+      slots.add(_formatMinutesToTime(current));
+      current += durationMinutes;
+    }
+
+    return slots.isNotEmpty ? slots : [...defaultAfternoonSlots, ...defaultEveningSlots];
+  }
+
+  List<String> get afternoonSlots => defaultAfternoonSlots;
+  List<String> get eveningSlots => defaultEveningSlots;
+  List<String> get morningSlots => const [];
+
+  List<String> get allOrderedSlots => [...afternoonSlots, ...eveningSlots];
+
   bool hasWorkingSlots(AdminDoctorModel doc, DateTime date) {
     final dayName = weekDays[date.weekday - 1];
     return doc.workingDays[dayName] == true;
@@ -88,6 +160,7 @@ class BookingCubit extends Cubit<BookingState> {
   bool isSlotBooked(String slot) => state.bookedSlots.contains(AdminRepository.normalizeTime(slot));
   int get availableAfternoonCount => afternoonSlots.where((s) => !isSlotBooked(s)).length;
   int get availableEveningCount => eveningSlots.where((s) => !isSlotBooked(s)).length;
+  int get availableMorningCount => morningSlots.where((s) => !isSlotBooked(s)).length;
   bool isDateWorking(DateTime date) => state.doctor != null && hasWorkingSlots(state.doctor!, date);
   int getAvailableSlots(DateTime date) => state.doctor != null ? getAvailableSlotsCount(state.doctor!, date) : 0;
 
@@ -118,7 +191,7 @@ class BookingCubit extends Cubit<BookingState> {
 
       final chosenDate = initialDate ?? datesList.first;
       final booked = getBookedSlotsForDate(match.id, chosenDate);
-      final allSlots = [...afternoonSlots, ...eveningSlots];
+      final allSlots = allOrderedSlots;
       final firstFreeSlot = allSlots.firstWhere(
         (s) => !booked.contains(AdminRepository.normalizeTime(s)),
         orElse: () => allSlots.first,
@@ -154,7 +227,7 @@ class BookingCubit extends Cubit<BookingState> {
 
     String? newSlot = state.selectedSlot;
     if (newSlot == null || booked.contains(AdminRepository.normalizeTime(newSlot))) {
-      final allSlots = [...afternoonSlots, ...eveningSlots];
+      final allSlots = allOrderedSlots;
       final firstFree = allSlots.firstWhere(
         (s) => !booked.contains(AdminRepository.normalizeTime(s)),
         orElse: () => '',
@@ -206,6 +279,15 @@ class BookingCubit extends Cubit<BookingState> {
 
     emit(state.copyWith(isSubmitting: true, errorMessage: null));
 
+    String location = doc.clinicLocation;
+    if (location.isEmpty) {
+      try {
+        location = adminRepository.centralLocation;
+      } catch (_) {
+        location = 'Central Clinic • 24 Garden Avenue';
+      }
+    }
+
     final newApt = PatientAppointmentModel(
       id: 'p_apt_${DateTime.now().millisecondsSinceEpoch}',
       doctorId: doc.id,
@@ -214,7 +296,7 @@ class BookingCubit extends Cubit<BookingState> {
       date: dateStr,
       time: slot,
       fee: doc.consultationFee,
-      clinicLocation: doc.clinicLocation,
+      clinicLocation: location,
       status: PatientAppointmentStatus.upcoming,
     );
 

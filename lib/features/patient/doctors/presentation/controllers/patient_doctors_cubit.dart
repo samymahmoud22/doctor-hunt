@@ -40,8 +40,12 @@ class PatientDoctorsCubit extends Cubit<PatientDoctorsState> {
         } catch (_) {}
       }
 
-      // Popular doctors sorted by rating descending
+      // Popular doctors sorted by reviewsCount descending
       final popular = List<AdminDoctorModel>.from(activeDoctors)
+        ..sort((a, b) => b.reviewsCount.compareTo(a.reviewsCount));
+
+      // Top rated doctors sorted by rating descending
+      final topRated = List<AdminDoctorModel>.from(activeDoctors)
         ..sort((a, b) => b.rating.compareTo(a.rating));
 
       final filtered = _applyFilters(
@@ -55,6 +59,7 @@ class PatientDoctorsCubit extends Cubit<PatientDoctorsState> {
       emit(state.copyWith(
         allDoctors: activeDoctors,
         popularDoctors: popular,
+        topRatedDoctors: topRated,
         filteredDoctors: filtered,
         favoriteDoctorIds: favorites,
         isLoading: false,

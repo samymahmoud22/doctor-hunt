@@ -104,7 +104,7 @@ class PatientMenuDrawer extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
               Expanded(
                 child: SizedBox(
@@ -115,67 +115,15 @@ class PatientMenuDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _MenuItem(
-                          icon: Icons.person_rounded,
-                          title: t.drawer.myDoctors,
-                          isSelected: selectedIndex == 0,
-                          onTap: () {
-                            onSelectTab(0);
-                            onClose();
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        _MenuItem(
-                          icon: Icons.description_outlined,
-                          title: t.drawer.medicalRecords,
-                          isSelected: false,
-                          onTap: () {
-                            onClose();
-                            _showFeatureDialog(
-                              context,
-                              t.drawer.medicalRecords,
-                              Icons.description_outlined,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        _MenuItem(
-                          icon: Icons.payment_rounded,
-                          title: t.drawer.payments,
-                          isSelected: false,
-                          onTap: () {
-                            onClose();
-                            _showFeatureDialog(
-                              context,
-                              t.drawer.payments,
-                              Icons.payment_rounded,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        _MenuItem(
-                          icon: Icons.medication_outlined,
-                          title: t.drawer.medicineOrders,
-                          isSelected: false,
-                          onTap: () {
-                            onClose();
-                            _showFeatureDialog(
-                              context,
-                              t.drawer.medicineOrders,
-                              Icons.medication_outlined,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        _MenuItem(
-                          icon: Icons.favorite_rounded,
-                          title: t.drawer.favourites,
+                          icon: Icons.people_outline_rounded,
+                          title: t.doctors.findDoctors,
                           isSelected: selectedIndex == 1,
                           onTap: () {
                             onSelectTab(1);
                             onClose();
                           },
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         _MenuItem(
                           icon: Icons.calendar_month_rounded,
                           title: t.drawer.myAppointments,
@@ -185,21 +133,17 @@ class PatientMenuDrawer extends StatelessWidget {
                             onClose();
                           },
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         _MenuItem(
-                          icon: Icons.help_outline_rounded,
-                          title: t.drawer.helpCenter,
+                          icon: Icons.favorite_rounded,
+                          title: t.drawer.favourites,
                           isSelected: false,
                           onTap: () {
                             onClose();
-                            _showFeatureDialog(
-                              context,
-                              t.drawer.helpCenter,
-                              Icons.help_outline_rounded,
-                            );
+                            context.push('/favourite-doctors');
                           },
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         _MenuItem(
                           icon: Icons.settings_rounded,
                           title: t.profile.settings,
@@ -207,6 +151,16 @@ class PatientMenuDrawer extends StatelessWidget {
                           onTap: () {
                             onSelectTab(3);
                             onClose();
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _MenuItem(
+                          icon: Icons.privacy_tip_outlined,
+                          title: t.profile.privacyPolicy,
+                          isSelected: false,
+                          onTap: () {
+                            onClose();
+                            context.push('/privacy-policy');
                           },
                         ),
                       ],
@@ -257,7 +211,7 @@ class PatientMenuDrawer extends StatelessWidget {
                       await sl<AuthCubit>().logout();
                     } catch (_) {}
                     if (context.mounted) {
-                      context.go('/login');
+                      context.go('/choose-role');
                     }
                   }
                 },
@@ -281,33 +235,6 @@ class PatientMenuDrawer extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showFeatureDialog(BuildContext context, String title, IconData icon) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        icon: CircleAvatar(
-          radius: 28,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-          child: Icon(icon, color: AppColors.primary, size: 28),
-        ),
-        title: Text(title, style: AppTextStyles.h3),
-        content: Text(
-          '$title will be available in the upcoming release. Stay tuned!',
-          style: AppTextStyles.subtext,
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => ctx.pop(),
-            child: Text(t.profile.ok, style: AppTextStyles.buttonSmall.withActiveTeal.withBold),
-          ),
-        ],
       ),
     );
   }

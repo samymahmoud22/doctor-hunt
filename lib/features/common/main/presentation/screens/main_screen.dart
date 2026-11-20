@@ -77,12 +77,12 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     final List<Widget> patientPages = [
       PatientHomeScreen(onOpenDrawer: _toggleDrawer),
       FindDoctorsScreen(
-        showBackButton: true,
+        showBackButton: false,
         onBack: () => setState(() => _currentIndex = 0),
-        initialFavoritesOnly: true,
+        initialFavoritesOnly: false,
       ),
       PatientAppointmentsScreen(
-        showBackButton: true,
+        showBackButton: false,
         onBack: () => setState(() => _currentIndex = 0),
       ),
       PatientProfileScreen(onToggleRole: _toggleRole),
@@ -227,20 +227,20 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           ),
           _buildNavItem(
             index: 1,
-            icon: Icons.favorite_border_rounded,
-            selectedIcon: Icons.favorite_rounded,
+            icon: Icons.people_outline_rounded,
+            selectedIcon: Icons.people_rounded,
             isSelected: _currentIndex == 1,
           ),
           _buildNavItem(
             index: 2,
-            icon: Icons.menu_book_outlined,
-            selectedIcon: Icons.menu_book_rounded,
+            icon: Icons.calendar_month_outlined,
+            selectedIcon: Icons.calendar_month_rounded,
             isSelected: _currentIndex == 2,
           ),
           _buildNavItem(
             index: 3,
-            icon: Icons.settings_outlined,
-            selectedIcon: Icons.settings_rounded,
+            icon: Icons.person_outline_rounded,
+            selectedIcon: Icons.person_rounded,
             isSelected: _currentIndex == 3,
           ),
         ],

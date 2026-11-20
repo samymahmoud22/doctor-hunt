@@ -186,44 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
                             },
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.primary,
-                                  side: const BorderSide(color: AppColors.primary, width: 1.2),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                ),
-                                icon: const Icon(Icons.person_rounded, size: 16),
-                                label: const Text('Demo Patient', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                onPressed: () {
-                                  _emailController.text = 'patient@doctorhunt.com';
-                                  _passwordController.text = '123456';
-                                  MainRoute(role: UserRole.patient).go(context);
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(0xFF505B73),
-                                  side: const BorderSide(color: Color(0xFF9E9E9E), width: 1.2),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                ),
-                                icon: const Icon(Icons.admin_panel_settings_rounded, size: 16),
-                                label: const Text('Demo Admin', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                onPressed: () {
-                                  _emailController.text = 'admin@doctorhunt.com';
-                                  _passwordController.text = '123456';
-                                  MainRoute(role: UserRole.admin).go(context);
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
 
                           GestureDetector(
                             onTap: () {
@@ -239,30 +202,33 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 28),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                t.auth.dontHaveAccount,
-                                style: context.regular14TextSub.copyWith(
-                                  color: const Color(0xFF677294),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              GestureDetector(
-                                onTap: () {
-                                  RegisterRoute(role: widget.role).go(context);
-                                },
-                                child: Text(
-                                  t.auth.joinUsLink,
-                                  style: context.bold14Primary.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
+                          if (widget.role != UserRole.admin) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  t.auth.dontHaveAccount,
+                                  style: context.regular14TextSub.copyWith(
+                                    color: const Color(0xFF677294),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                                const SizedBox(width: 6),
+                                GestureDetector(
+                                  onTap: () {
+                                    RegisterRoute(role: UserRole.patient).go(context);
+                                  },
+                                  child: Text(
+                                    t.auth.joinUsLink,
+                                    style: context.bold14Primary.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                          ],
                           const SizedBox(height: 20),
                         ],
                       ),
