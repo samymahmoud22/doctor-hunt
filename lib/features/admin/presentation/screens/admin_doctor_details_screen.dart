@@ -53,13 +53,20 @@ class _AdminDoctorDetailsView extends StatelessWidget {
         final doctor = match;
         final cubit = context.read<AdminDoctorsCubit>();
 
-        return Scaffold(
-          backgroundColor: const Color(0xFFF9FAFB),
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-              onPressed: () => context.pop(),
-            ),
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              context.pop(true);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF9FAFB),
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                onPressed: () => context.pop(true),
+              ),
             title: const Text(
               'Doctor Details',
               style: TextStyle(
@@ -106,7 +113,6 @@ class _AdminDoctorDetailsView extends StatelessWidget {
                           context.showSnackBar(
                             'Doctor status updated to ${newStatus ? "Active" : "Inactive"}',
                           );
-                          context.pop(true);
                         }
                       }
                     }
@@ -247,7 +253,9 @@ class _AdminDoctorDetailsView extends StatelessWidget {
                         _buildInfoTile(
                           icon: Icons.star_outline_rounded,
                           label: 'Rating',
-                          value: '${doctor.rating} • ${doctor.reviewsCount} reviews',
+                          value: doctor.reviewsCount == 0
+                              ? 'No reviews yet'
+                              : '${doctor.rating.toStringAsFixed(1)} • ${doctor.reviewsCount} reviews',
                         ),
                         const Divider(height: 1, indent: 64, endIndent: 20, color: Color(0xFFF3F4F6)),
                         _buildInfoTile(
@@ -294,8 +302,9 @@ class _AdminDoctorDetailsView extends StatelessWidget {
               ),
             ),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 

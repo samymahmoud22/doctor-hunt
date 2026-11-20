@@ -265,6 +265,13 @@ Follow these steps to run the project on your local machine:
    ```
    *(Fallback configurations are defined in [supabase_constants.dart](lib/core/constants/supabase_constants.dart) for quick local development).*
 
+4. **Supabase Database & Permissions Setup:**
+   Run the unified migration script located at [`supabase/migrations/20261120_fix_permissions_and_admin_setup.sql`](supabase/migrations/20261120_fix_permissions_and_admin_setup.sql) in your Supabase SQL Editor:
+   - Creates all core tables (`doctors`, `appointments`, `reviews`, `user_favorites`) with `IF NOT EXISTS`.
+   - Grants permissions and sets Row Level Security (RLS) policies for `anon` and `authenticated` roles (resolving error `42501`).
+   - Automatically seeds verified doctor data if the table is empty.
+   - Provides quick SQL queries to create or promote an Admin account directly via metadata (`{"role": "admin"}`).
+
 ### Code Generation
 
 Doctor Hunt uses code generators for translations and routes. If you update translation strings in `assets/i18n/`:

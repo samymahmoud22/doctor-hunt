@@ -46,8 +46,8 @@ class AuthRepository {
             specialty: 'Specialist General',
             consultationFee: 30.0,
             isActive: true,
-            rating: 5.0,
-            reviewsCount: 1,
+            rating: 0.0,
+            reviewsCount: 0,
           ),
         );
       }

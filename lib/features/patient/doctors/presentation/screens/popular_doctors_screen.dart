@@ -225,16 +225,22 @@ class _FigmaDoctorListCard extends StatelessWidget {
                       Row(
                         children: List.generate(
                           5,
-                          (i) => Icon(
-                            Icons.star_rounded,
-                            color: i < 4 ? const Color(0xFFF6D060) : const Color(0xFFE5E7EB),
-                            size: 14,
-                          ),
+                          (i) {
+                            final isFilled = doctor.reviewsCount > 0 &&
+                                i < (doctor.rating.round().clamp(0, 5));
+                            return Icon(
+                              Icons.star_rounded,
+                              color: isFilled ? const Color(0xFFF6D060) : const Color(0xFFE5E7EB),
+                              size: 14,
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '${doctor.rating}',
+                        doctor.reviewsCount == 0
+                            ? 'No reviews'
+                            : doctor.rating.toStringAsFixed(1),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -244,7 +250,9 @@ class _FigmaDoctorListCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '(${doctor.reviewsCount} views)',
+                          doctor.reviewsCount == 0
+                              ? ''
+                              : '(${doctor.reviewsCount} reviews)',
                           style: const TextStyle(
                             fontSize: 11,
                             color: Color(0xFF677294),
