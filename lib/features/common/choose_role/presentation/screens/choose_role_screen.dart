@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/enums/user_role.dart';
 import 'package:doctor_hunt/core/router/app_router.dart';
+import 'package:doctor_hunt/core/services/session_manager.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/logo_header.dart';
@@ -44,9 +45,22 @@ class ChooseRoleScreen extends StatelessWidget {
 
                   return Column(
                     children: [
-                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.textMain),
+                          onPressed: () async {
+                            if (sl.isRegistered<SessionManager>()) {
+                              await sl<SessionManager>().setOnboardingCompleted(false);
+                            }
+                            if (context.mounted) {
+                              const OnboardingRoute().go(context);
+                            }
+                          },
+                        ),
+                      ),
                       const LogoHeader(size: 64),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       Text(
                         t.role.title,
                         style: context.bold24TextMain,

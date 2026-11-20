@@ -211,7 +211,7 @@ class PatientMenuDrawer extends StatelessWidget {
                       await sl<AuthCubit>().logout();
                     } catch (_) {}
                     if (context.mounted) {
-                      context.go('/login');
+                      context.go('/choose-role');
                     }
                   }
                 },

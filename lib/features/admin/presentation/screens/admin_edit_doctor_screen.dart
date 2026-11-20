@@ -1,9 +1,12 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/extensions/context_ext.dart';
+import 'package:doctor_hunt/core/services/supabase_storage_service.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
 import 'package:doctor_hunt/core/utils/doctor_image_helper.dart';
+import 'package:doctor_hunt/core/utils/image_picker_helper.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
 import '../../data/models/admin_doctor_model.dart';
@@ -24,6 +27,8 @@ class _AdminEditDoctorScreenState extends State<AdminEditDoctorScreen> {
   late TextEditingController _feeController;
   late String _selectedSpecialty;
   late bool _isActive;
+  Uint8List? _doctorImageBytes;
+  String? _imageUrl;
   bool _isLoading = false;
 
   final List<String> _specialties = [
@@ -48,6 +53,7 @@ class _AdminEditDoctorScreenState extends State<AdminEditDoctorScreen> {
         ? widget.doctor.specialty
         : _specialties.first;
     _isActive = widget.doctor.isActive;
+    _imageUrl = widget.doctor.imageUrl;
   }
 
   @override
@@ -64,10 +70,24 @@ class _AdminEditDoctorScreenState extends State<AdminEditDoctorScreen> {
     final fee = double.tryParse(_feeController.text.replaceAll('\$', '').trim()) ??
         widget.doctor.consultationFee;
 
+    if (_doctorImageBytes != null) {
+      try {
+        final storage = sl.isRegistered<SupabaseStorageService>()
+            ? sl<SupabaseStorageService>()
+            : SupabaseStorageService();
+        final url = await storage.uploadDoctorAvatar(
+          doctorId: widget.doctor.id,
+          bytes: _doctorImageBytes!,
+        );
+        if (url != null) _imageUrl = url;
+      } catch (_) {}
+    }
+
     final updated = widget.doctor.copyWith(
       name: _nameController.text.trim(),
       specialty: _selectedSpecialty,
       consultationFee: fee,
+      imageUrl: _imageUrl,
       isActive: _isActive,
     );
 
@@ -122,35 +142,54 @@ class _AdminEditDoctorScreenState extends State<AdminEditDoctorScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Stack(
-                        children: [
-                          DoctorImageHelper.buildDoctorAvatar(
-                            doctorName: widget.doctor.name,
-                            imageUrl: widget.doctor.imageUrl,
-                            radius: 50,
-                          ),
-                          Positioned(
-                            bottom: 2,
-                            right: 2,
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: AppColors.primary,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt_rounded,
-                                color: Colors.white,
-                                size: 16,
+                      GestureDetector(
+                        onTap: () async {
+                          final bytes = await ImagePickerHelper.pickImageBytes(context);
+                          if (bytes != null) {
+                            setState(() {
+                              _doctorImageBytes = bytes;
+                            });
+                          }
+                        },
+                        child: Stack(
+                          children: [
+                            _doctorImageBytes != null
+                                ? ClipOval(
+                                    child: Image.memory(
+                                      _doctorImageBytes!,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : DoctorImageHelper.buildDoctorAvatar(
+                                    doctorName: widget.doctor.name,
+                                    imageUrl: _imageUrl,
+                                    radius: 50,
+                                  ),
+                            Positioned(
+                              bottom: 2,
+                              right: 2,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt_rounded,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Tap photo to change',
-                        style: TextStyle(
+                      Text(
+                        _doctorImageBytes != null ? 'Photo selected (tap to change)' : 'Tap photo to change',
+                        style: const TextStyle(
                           color: AppColors.primary,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

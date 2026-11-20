@@ -273,63 +273,34 @@ class AppRouter {
 
 
     // Allow splash screen to display initial animation and decide route
-
-    if (isSplash) return null;
-
-
+    if (isSplash || location == '/') return null;
 
     // 1. If onboarding hasn't been completed yet, force redirect to /onboarding
-
     if (!isOnboardingDone && !isOnboarding) {
-
       return '/onboarding';
-
     }
-
-
 
     // 2. If onboarding is already completed, do not allow returning to /onboarding
-
     if (isOnboardingDone && isOnboarding) {
-
       return isAuth ? '/main?role=${role.value}' : '/choose-role';
-
     }
-
-
 
     // 3. Protected admin routes: require authentication and admin role
-
     if (isAdminRoute) {
-
       if (!isAuth) {
-
         return '/login?role=admin';
-
       }
-
       if (role != UserRole.admin) {
-
         return '/main?role=patient';
-
       }
-
     }
-
-
 
     // 4. Authenticated users should not revisit login / register
-
     if (isAuth && (location == '/login' || location == '/register')) {
-
       return '/main?role=${role.value}';
-
     }
 
-
-
     return null;
-
   }
 
 
@@ -357,8 +328,11 @@ class AppRouter {
       redirect: guardRoute,
 
       routes: [
-
-      ...$appRoutes,
+        GoRoute(
+          path: '/',
+          redirect: (context, state) => '/splash',
+        ),
+        ...$appRoutes,
 
       GoRoute(
 

@@ -1,9 +1,11 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/extensions/context_ext.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
+import 'package:doctor_hunt/core/utils/image_picker_helper.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
 import '../controllers/admin_profile_cubit.dart';
@@ -21,6 +23,7 @@ class _AdminEditProfileScreenState extends State<AdminEditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _locationController;
+  Uint8List? _avatarBytes;
 
   @override
   void initState() {
@@ -92,47 +95,66 @@ class _AdminEditProfileScreenState extends State<AdminEditProfileScreen> {
                       Center(
                         child: Column(
                           children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 96,
-                                  height: 96,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFE7F8F2),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    state.initials,
-                                    style: const TextStyle(
-                                      color: AppColors.primary,
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 2,
-                                  right: 2,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6),
+                            GestureDetector(
+                              onTap: () async {
+                                final bytes = await ImagePickerHelper.pickImageBytes(context);
+                                if (bytes != null) {
+                                  setState(() {
+                                    _avatarBytes = bytes;
+                                  });
+                                }
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 96,
+                                    height: 96,
                                     decoration: const BoxDecoration(
-                                      color: AppColors.primary,
+                                      color: Color(0xFFE7F8F2),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(
-                                      Icons.camera_alt_rounded,
-                                      color: Colors.white,
-                                      size: 16,
+                                    alignment: Alignment.center,
+                                    child: _avatarBytes != null
+                                        ? ClipOval(
+                                            child: Image.memory(
+                                              _avatarBytes!,
+                                              width: 96,
+                                              height: 96,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )
+                                        : Text(
+                                            state.initials,
+                                            style: const TextStyle(
+                                              color: AppColors.primary,
+                                              fontSize: 32,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                  ),
+                                  Positioned(
+                                    bottom: 2,
+                                    right: 2,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.primary,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.camera_alt_rounded,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'Tap photo to change',
-                              style: TextStyle(
+                            Text(
+                              _avatarBytes != null ? 'Photo selected' : 'Tap photo to change',
+                              style: const TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,

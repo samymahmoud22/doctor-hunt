@@ -1,3 +1,5 @@
+import 'package:doctor_hunt/core/services/session_manager.dart';
+import 'package:doctor_hunt/features/common/auth/data/repo/auth_repository.dart';
 import 'package:doctor_hunt/core/utils/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -23,9 +25,43 @@ class PatientProfileScreen extends StatefulWidget {
 }
 
 class _PatientProfileScreenState extends State<PatientProfileScreen> {
-  final String _fullName = 'Patient User';
-  final String _email = 'admin@doctorhunt.com';
+  String _fullName = 'Patient User';
+  String _email = 'patient@doctorhunt.com';
+  String? _avatarUrl;
   bool _notificationsEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  void _loadUserInfo() {
+    if (sl.isRegistered<SessionManager>()) {
+      final session = sl<SessionManager>();
+      setState(() {
+        _fullName = session.userName ?? 'Patient User';
+        _email = session.userEmail ?? 'patient@doctorhunt.com';
+      });
+    }
+    if (sl.isRegistered<AuthRepository>()) {
+      sl<AuthRepository>().getPatientProfile().then((profile) {
+        if (mounted) {
+          setState(() {
+            if (profile['fullName'] != null && profile['fullName']!.isNotEmpty) {
+              _fullName = profile['fullName']!;
+            }
+            if (profile['email'] != null && profile['email']!.isNotEmpty) {
+              _email = profile['email']!;
+            }
+            if (profile['avatarUrl'] != null && profile['avatarUrl']!.isNotEmpty) {
+              _avatarUrl = profile['avatarUrl'];
+            }
+          });
+        }
+      }).catchError((_) {});
+    }
+  }
 
   void _showChangePasswordDialog() {
     final newPassCtrl = TextEditingController();
@@ -165,7 +201,10 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                 const SizedBox(height: 20),
 
                 GestureDetector(
-                  onTap: () => context.push('/patient/profile'),
+                  onTap: () async {
+                    await context.push('/patient/profile');
+                    _loadUserInfo();
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
@@ -189,10 +228,19 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                             border: Border.all(color: AppColors.activeTeal, width: 1.5),
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              ImageAssets.onboarding2Jpg,
-                              fit: BoxFit.cover,
-                            ),
+                            child: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                                ? Image.network(
+                                    _avatarUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) => Image.asset(
+                                      ImageAssets.onboarding2Jpg,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Image.asset(
+                                    ImageAssets.onboarding2Jpg,
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                         ),
                         const SizedBox(width: 14),

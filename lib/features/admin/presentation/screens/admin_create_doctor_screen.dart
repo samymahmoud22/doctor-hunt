@@ -1,8 +1,11 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/extensions/context_ext.dart';
+import 'package:doctor_hunt/core/services/supabase_storage_service.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
+import 'package:doctor_hunt/core/utils/image_picker_helper.dart';
 import 'package:doctor_hunt/core/widgets/custom_button.dart';
 import 'package:doctor_hunt/core/widgets/custom_text_field.dart';
 import '../../data/models/admin_doctor_model.dart';
@@ -20,6 +23,7 @@ class _AdminCreateDoctorScreenState extends State<AdminCreateDoctorScreen> {
   final _nameController = TextEditingController();
   final _feeController = TextEditingController();
   String? _selectedSpecialty;
+  Uint8List? _doctorImageBytes;
   bool _isLoading = false;
 
   final List<String> _specialties = [
@@ -49,12 +53,27 @@ class _AdminCreateDoctorScreenState extends State<AdminCreateDoctorScreen> {
 
     setState(() => _isLoading = true);
     final fee = double.tryParse(_feeController.text.replaceAll('\$', '').trim()) ?? 28.0;
+    final doctorId = 'doc_${DateTime.now().millisecondsSinceEpoch}';
+
+    String? uploadedUrl;
+    if (_doctorImageBytes != null) {
+      try {
+        final storage = sl.isRegistered<SupabaseStorageService>()
+            ? sl<SupabaseStorageService>()
+            : SupabaseStorageService();
+        uploadedUrl = await storage.uploadDoctorAvatar(
+          doctorId: doctorId,
+          bytes: _doctorImageBytes!,
+        );
+      } catch (_) {}
+    }
 
     final newDoctor = AdminDoctorModel(
-      id: 'doc_${DateTime.now().millisecondsSinceEpoch}',
+      id: doctorId,
       name: _nameController.text.trim(),
       specialty: _selectedSpecialty!,
       consultationFee: fee,
+      imageUrl: uploadedUrl,
       isActive: true,
       rating: 0.0,
       reviewsCount: 0,
@@ -107,27 +126,44 @@ class _AdminCreateDoctorScreenState extends State<AdminCreateDoctorScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDF4),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            width: 1.5,
+                      GestureDetector(
+                        onTap: () async {
+                          final bytes = await ImagePickerHelper.pickImageBytes(context);
+                          if (bytes != null) {
+                            setState(() {
+                              _doctorImageBytes = bytes;
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF0FDF4),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              width: 1.5,
+                            ),
                           ),
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt_outlined,
-                          size: 36,
-                          color: AppColors.primary,
+                          child: _doctorImageBytes != null
+                              ? ClipOval(
+                                  child: Image.memory(
+                                    _doctorImageBytes!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.camera_alt_outlined,
+                                  size: 36,
+                                  color: AppColors.primary,
+                                ),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Add photo',
-                        style: TextStyle(
+                      Text(
+                        _doctorImageBytes != null ? 'Change photo' : 'Add photo',
+                        style: const TextStyle(
                           color: AppColors.primary,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,

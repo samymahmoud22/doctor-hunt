@@ -223,7 +223,7 @@ class AdminSettingsScreen extends StatelessWidget {
                           if (confirm == true) {
                             await sl<AuthCubit>().logout();
                             if (context.mounted) {
-                              const LoginRoute().go(context);
+                              const ChooseRoleRoute().go(context);
                             }
                           }
                         },

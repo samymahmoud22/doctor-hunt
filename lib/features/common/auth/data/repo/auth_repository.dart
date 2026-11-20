@@ -82,10 +82,12 @@ class AuthRepository {
   Future<void> updatePatientProfile({
     required String fullName,
     required String phone,
+    String? avatarUrl,
   }) async {
     await authService.updatePatientProfile(
       fullName: fullName,
       phone: phone,
+      avatarUrl: avatarUrl,
     );
   }
 

@@ -221,11 +221,13 @@ class AuthService {
           'Sarah Johnson';
       final phone = (metadata?['phone'] as String?) ?? '+201000000000';
       final email = user?.email ?? 'patient@doctorhunt.com';
+      final avatarUrl = (metadata?['avatar_url'] as String?) ?? (metadata?['picture'] as String?);
 
       return {
         'fullName': fullName,
         'phone': phone,
         'email': email,
+        if (avatarUrl != null && avatarUrl.isNotEmpty) 'avatarUrl': avatarUrl,
       };
     } catch (_) {
       return {
@@ -239,14 +241,19 @@ class AuthService {
   Future<void> updatePatientProfile({
     required String fullName,
     required String phone,
+    String? avatarUrl,
   }) async {
     try {
+      final data = <String, dynamic>{
+        'full_name': fullName,
+        'phone': phone,
+      };
+      if (avatarUrl != null && avatarUrl.isNotEmpty) {
+        data['avatar_url'] = avatarUrl;
+      }
       await _client.auth.updateUser(
         UserAttributes(
-          data: {
-            'full_name': fullName,
-            'phone': phone,
-          },
+          data: data,
         ),
       );
     } on AuthException catch (e) {
