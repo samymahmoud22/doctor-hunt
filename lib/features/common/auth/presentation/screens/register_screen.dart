@@ -29,7 +29,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _agreedToTerms = false;
-  late UserRole _selectedRole;
 
   final RegExp _emailRegex = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
@@ -38,7 +37,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedRole = widget.role ?? UserRole.patient;
   }
 
   @override
@@ -52,11 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) {
-        final cubit = sl<AuthCubit>();
-        cubit.setRole(_selectedRole);
-        return cubit;
-      },
+      create: (_) => sl<AuthCubit>()..setRole(UserRole.patient),
       child: Scaffold(
         body: Container(
           width: double.infinity,
@@ -121,99 +115,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 18),
 
-                          // Role selection toggle
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF0F3F6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedRole = UserRole.patient;
-                                      });
-                                      cubit.setRole(UserRole.patient);
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: _selectedRole == UserRole.patient ? Colors.white : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: _selectedRole == UserRole.patient
-                                            ? [
-                                                BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.06),
-                                                  blurRadius: 6,
-                                                  offset: const Offset(0, 2),
-                                                ),
-                                              ]
-                                            : null,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'مريض (Patient)',
-                                          style: TextStyle(
-                                            color: _selectedRole == UserRole.patient ? AppColors.primary : const Color(0xFF677294),
-                                            fontWeight: _selectedRole == UserRole.patient ? FontWeight.bold : FontWeight.w500,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedRole = UserRole.admin;
-                                      });
-                                      cubit.setRole(UserRole.admin);
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: _selectedRole == UserRole.admin ? Colors.white : Colors.transparent,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: _selectedRole == UserRole.admin
-                                            ? [
-                                                BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.06),
-                                                  blurRadius: 6,
-                                                  offset: const Offset(0, 2),
-                                                ),
-                                              ]
-                                            : null,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'طبيب / أدمن (Doctor)',
-                                          style: TextStyle(
-                                            color: _selectedRole == UserRole.admin ? AppColors.primary : const Color(0xFF677294),
-                                            fontWeight: _selectedRole == UserRole.admin ? FontWeight.bold : FontWeight.w500,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          GoogleSignInCard(
+                            onTap: () => cubit.loginWithGoogle(),
+                            isLoading: state.status == AuthStatus.loading,
                           ),
-                          const SizedBox(height: 20),
-
-                          if (_selectedRole != UserRole.admin) ...[
-                            GoogleSignInCard(
-                              onTap: () => cubit.loginWithGoogle(),
-                              isLoading: state.status == AuthStatus.loading,
-                            ),
-                            const SizedBox(height: 24),
-                          ],
+                          const SizedBox(height: 24),
 
                           CustomTextField(
                             hint: t.auth.nameHint,
@@ -335,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               const SizedBox(width: 6),
                               GestureDetector(
                                 onTap: () {
-                                  LoginRoute(role: _selectedRole).go(context);
+                                  LoginRoute(role: UserRole.patient).go(context);
                                 },
                                 child: Text(
                                   t.auth.logInLink,
