@@ -1,3 +1,4 @@
+﻿import 'package:doctor_hunt/generated/i18n/strings.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -67,17 +68,17 @@ class _PopularDoctorsView extends StatelessWidget {
                         child: const Icon(
                           Icons.arrow_back_ios_new_rounded,
                           size: 16,
-                          color: Color(0xFF333333),
+                          color: AppColors.textMain,
                         ),
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
-                      'Popular Doctors',
+                    Text(
+                      t.home.popularDoctors,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF333333),
+                        color: AppColors.textMain,
                       ),
                     ),
                   ],
@@ -187,7 +188,7 @@ class _FigmaDoctorListCard extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF333333),
+                            color: AppColors.textMain,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -237,7 +238,7 @@ class _FigmaDoctorListCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF333333),
+                          color: AppColors.textMain,
                         ),
                       ),
                       const SizedBox(width: 4),

@@ -60,20 +60,23 @@ The system addresses both sides of medical care management:
 ## ✨ Key Features
 
 ### 👤 Patient Experience
-- **Interactive Onboarding:** Clean carousel introducing telehealth consultation and medical discovery.
-- **Dynamic Home Dashboard:** Live doctor availability indicators, popular specialists, medical category filters, and debounced quick search.
-- **Doctor Discovery & Filtering:** Filter specialists by field (Cardiology, Pediatrics, Neurology, etc.), rating, and consultation fees.
+- **Interactive Onboarding:** Clean carousel introducing medical discovery and appointment booking.
+- **Dynamic Home Dashboard:** Top Rated Doctors, popular specialists (sorted by reviews count), medical category filters, and debounced quick search.
+- **Doctor Discovery & Filtering:** Dedicated discovery tab to search specialists by name, filter by specialty, and toggle favorites.
 - **Detailed Physician Profiles:** Comprehensive doctor bios, consultation pricing, patient reviews, and practice credentials.
-- **Smart Appointment Booking:** Dynamic time slot selector that cross-references confirmed appointments to eliminate double-booking conflicts.
-- **Patient Appointment Center:** Tabbed views (Upcoming, Completed, Canceled) with direct navigation to detailed status screens and cancellation workflows.
-- **Patient Drawer Navigation:** Quick access to Profile, My Appointments, Medical Records, Payments, Medicine Orders, Help Center, Settings, and Sign Out.
+- **4-Step Smart Appointment Booking:** Select Date (from active working days) -> Select Time Slot (with double-booking prevention) -> Review Appointment modal (showing Doctor, Specialty, Date, Time, Central Clinic Location, and Fee) -> Confirm.
+- **Strict 3-State Appointment Lifecycle:** Appointments can only transition across `Upcoming`, `Completed`, or `Cancelled`.
+- **Patient Drawer Navigation:** Clean core navigation for Find Doctors, My Appointments, Favorites, Settings, Privacy Policy, and Sign Out.
 - **User-Scoped Favorites:** Save and unfavorite preferred doctors with persistent local and cloud state tied to the authenticated user ID.
+- **Verified Patient Reviews:** Strictly allowed only after appointment completion (`status == completed`) with 1-5 star ratings and optional feedback.
 
 ### 🛡️ Admin Experience
-- **Physician Catalog Management:** Create, view, update, and manage doctor profiles with image uploading via Supabase Storage.
+- **Physician Catalog Management:** Create and edit doctor profiles (Photo, Name, Specialty, Fee) with image uploading via Supabase Storage.
+- **Doctor Status Toggle (Activate / Deactivate):** Soft toggle to activate or deactivate doctor profiles without hard deletion, preserving appointment history.
+- **Single Central Clinic Location:** Centrally managed clinic location set by the admin that automatically propagates across all doctor profiles and patient appointments.
 - **Availability & Slot Scheduler:** Configure weekly working schedules, shift hours, and available appointment booking intervals.
-- **Appointment Control Dashboard:** Monitor patient bookings in real time, review consultation requests, and update statuses (Confirm, Cancel, Complete).
-- **Clinic Administration:** Manage clinic operational settings and administrative profiles.
+- **Appointment Operations Dashboard:** 4 tabs (All, Upcoming, Completed, Cancelled) with the ability to Cancel or Mark Completed for Upcoming appointments.
+- **Clinic Administration:** Manage clinic operational settings and central clinic location.
 
 ### 🔐 Authentication, Route Guards & Security
 - **Multi-Role System:** Strongly-typed role separation (`UserRole.patient` and `UserRole.admin`) via Dart enums.
@@ -175,7 +178,7 @@ lib/
 │   └── widgets/               # CustomButton, CustomTextField, LogoHeader
 │
 ├── features/
-│   ├── admin/                 # Admin Module
+│   ├── admin/                 # Admin Module (doctors catalog, availability scheduler, appointments)
 │   │   ├── data/              # Admin models, repositories, mock/live sources
 │   │   └── presentation/      # Admin screens, cubits, widgets, extensions
 │   ├── common/                # Shared Cross-Cutting Features
@@ -186,11 +189,12 @@ lib/
 │   │   └── splash/            # Splash screen & session gatekeeper
 │   └── patient/               # Patient Module
 │       ├── appointments/      # Booking management, status tabs, extensions
-│       ├── doctors/           # Doctor search, reviews, slots, live consultation
-│       └── home/              # Patient dashboard, favorites, drawer menu
+│       ├── doctors/           # Doctor discovery, dynamic availability, 4-step booking, reviews
+│       └── home/              # Patient dashboard, top rated & popular doctors, drawer menu
 │
 ├── generated/
 │   └── i18n/                  # Slang generated translation files (strings.g.dart)
+├── i18n/                      # Slang JSON translation sources (strings.i18n.json, strings_ar.i18n.json)
 └── main.dart                  # App bootstrap, provider setup & initializations
 
 test/                          # Comprehensive 200 automated tests

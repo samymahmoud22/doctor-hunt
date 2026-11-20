@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:doctor_hunt/features/admin/data/models/admin_doctor_model.dart';
 import 'package:doctor_hunt/features/admin/data/repo/admin_repository.dart';
@@ -60,7 +60,8 @@ void main() {
         PatientDoctorsState(
           isLoading: false,
           allDoctors: [sampleDoctors[0], sampleDoctors[1]],
-          popularDoctors: [sampleDoctors[1], sampleDoctors[0]], // sorted by rating (4.9 before 4.8)
+          popularDoctors: [sampleDoctors[1], sampleDoctors[0]],
+          topRatedDoctors: [sampleDoctors[1], sampleDoctors[0]],
           filteredDoctors: [sampleDoctors[0], sampleDoctors[1]],
           favoriteDoctorIds: const {'doc_1'},
         ),

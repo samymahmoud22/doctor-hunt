@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:doctor_hunt/core/di/service_locator.dart';
 import 'package:doctor_hunt/core/themes/app_colors.dart';
@@ -154,7 +154,7 @@ class _PatientHomeView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    t.home.liveDoctors,
+                    t.home.topRatedDoctors,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -184,19 +184,19 @@ class _PatientHomeView extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  _LiveDoctorCard(
+                  _TopDoctorCard(
                     image: ImageAssets.doctorLiveFemale,
                     onTap: () => context.push('/find-doctors'),
                   ),
-                  _LiveDoctorCard(
+                  _TopDoctorCard(
                     image: ImageAssets.doctorMaleScrubs,
                     onTap: () => context.push('/find-doctors'),
                   ),
-                  _LiveDoctorCard(
+                  _TopDoctorCard(
                     image: ImageAssets.doctorPopularFemale,
                     onTap: () => context.push('/find-doctors'),
                   ),
-                  _LiveDoctorCard(
+                  _TopDoctorCard(
                     image: ImageAssets.doctorMaleCoat,
                     onTap: () => context.push('/find-doctors'),
                   ),
@@ -635,11 +635,11 @@ class _ToothPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _LiveDoctorCard extends StatelessWidget {
+class _TopDoctorCard extends StatelessWidget {
   final String image;
   final VoidCallback onTap;
 
-  const _LiveDoctorCard({
+  const _TopDoctorCard({
     required this.image,
     required this.onTap,
   });
